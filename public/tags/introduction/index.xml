@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>introduction on Poison</title>
+    <link>https://poison.lukeorth.com/tags/introduction/</link>
+    <description>Recent content in introduction on Poison</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 23 Nov 2022 13:43:53 -0600</lastBuildDate><atom:link href="https://poison.lukeorth.com/tags/introduction/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introducing Poison</title>
+      <link>https://poison.lukeorth.com/posts/introducing-poison/</link>
+      <pubDate>Wed, 23 Nov 2022 13:43:53 -0600</pubDate>
+      
+      <guid>https://poison.lukeorth.com/posts/introducing-poison/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Poison&lt;/em&gt; is a &lt;strong&gt;clean&lt;/strong&gt;, &lt;strong&gt;professional&lt;/strong&gt; Hugo theme designed to &lt;strong&gt;captivate&lt;/strong&gt; your readers.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s also &lt;strong&gt;tiny&lt;/strong&gt; and &lt;strong&gt;privacy conscious&lt;/strong&gt; with &lt;em&gt;no external dependencies&lt;/em&gt; (unless you opt to include comments).  No JavaScript frameworks, icon packs, or Google fonts.  No ads or trackers polluting your console window.  &lt;strong&gt;We kept things simple&lt;/strong&gt;.  A little vanilla JavaScript, a dash of CSS, and the power of Hugo.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

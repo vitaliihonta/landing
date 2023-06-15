@@ -1,55 +1,69 @@
 baseURL = 'https://vhonta.dev/'
 languageCode = 'en-us'
-title = 'Vitalii Honta'
-paginate = 6
-theme = "roxo"
-# Main Menu
-[[menu.main]]
-name = "Home"
-url = "#home"
-weight = 1
-[[menu.main]]
-name = "About"
-url = "#about"
-weight = 2
-[[menu.main]]
-name = "Skills"
-url = "#skills"
-weight = 6
-[[menu.main]]
-name = "Blog"
-url = "#blog"
-weight = 7
-[[menu.main]]
-name = "Contact"
-url = "#contact"
-weight = 8
-
-# Sitemap Menu
-[[menu.sitemap]]
-name = "About me"
-url = "about"
-weight = 1
+title = "Vitalii Honta"
+theme = "poison"
+paginate = 10
+pluralizelisttitles = false
+disqusShortname = 'poison'
+disqus_url = 'https://poison.lukeorth.com'
 
 [params]
-blogPageURL = "blog"
-contactLink = "contact"
-#copyright = "All right reserved copyright © Portio 2020"
-footerLogo = "images/contact/widget-logo.png"
-# We're using formspree.io for form handling, paste your formspree url below
-#fabformURL  = "https://fabform.io/f/JpTXRUa"
-#googleAnalytics = "YOUR GOOGLE ANALYTICS CODE"
-logo = "images/site-navigation/logo.png"
+    brand = "Vitalii Honta"
+    brand_image = "/images/avatar_square.png"
+    # og_image = ""                             # path to social icon - front matter: image takes precedent, then og_image, then brand_url
+    # publisher_icon = ""                       # path to publisher icon - defaults to favicon, used in schema
+    # favicon = ""                              # path to favicon
+    # description = "Update this description..."  # Used as default meta description if not specified in front matter
+    dark_mode = true
 
-[params.address]
-email = "vitalii.honta@gmail.com"
+    menu = [
+        {Name = "About", URL = "/about/", HasChildren = false},
+        {Name = "Posts", URL = "/posts/", Pre = "Recent", HasChildren = true, Limit = 5},
+    ]
 
-# Social icons
-[[params.social]]
-icon = "fa-facebook-official"
-url = "https://www.facebook.com/"
-weight = 1
-[[params.social]]
-icon = "fa-linkedin-square"
-url = "https://www.linkedin.com/"
-weight = 2
+    github_url = "https://github.com/vitaliihonta"
+    linkedin_url = "https://www.linkedin.com/in/vitalii-honta-a70236129/"
+    twitter_url = "https://twitter.com/HontaVitalii"
+    email_url = "mailto://vitalii.honta@gmail.com"
+
+    # Adds an RSS icon to the end of the socials which links to {{ .Site.BaseURL }}/index.xml
+    rss_icon = false
+    # Which section the RSS icon links to, defaults to all content. See https://gohugo.io/templates/rss/#section-rss
+    rss_section = "posts"
+
+    # sidebar
+    sidebar_bg_color = "#ede3d3"            # default is #202020
+    sidebar_img_border_color = "#515151"    # default is #515151
+    sidebar_p_color = "#333131"             # default is #909090
+    sidebar_h1_color = "#065ba1"               # default is #FFF
+    sidebar_a_color = "#065ba1"                # default is #FFF
+    sidebar_socials_color = "#515151"          # default is #FFF
+    moon_sun_color = "#FFF"                 # default is #FFF
+    moon_sun_background_color = "#515151"   # default is #515151
+
+    # light mode
+    text_color = "#222"             # default is #222
+    content_bg_color = "#FAF9F6"    # default is #FAF9F6
+    post_title_color = "#303030"    # default is #303030
+    list_color = "#5a5a5a"          # default is #5a5a5a
+    link_color = "#268bd2"          # default is #268bd2
+    date_color = "#515151"          # default is #515151
+    table_border_color = "#E5E5E5"  # default is #E5E5E5
+    table_stripe_color = "#F9F9F9"  # default is #F9F9F9
+
+    # dark mode
+    text_color_dark = "#eee"            # default is #eee
+    content_bg_color_dark = "#121212"   # default is #121212
+    post_title_color_dark = "#DBE2E9"   # default is #DBE2E9
+    list_color_dark = "#9d9d9d"         # default is #9d9d9d
+    link_color_dark = "#268bd2"         # default is #268bd2
+    date_color_dark = "#9a9a9a"         # default is #9a9a9a
+    table_border_color_dark = "#515151" # default is #515151
+    table_stripe_color_dark = "#202020" # default is #202020
+
+
+[params.meta]
+    favicon = true
+[taxonomies]
+    series = 'series'
+    tags = 'tags'
