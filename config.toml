@@ -12,7 +12,7 @@ disqus_url = 'https://poison.lukeorth.com'
     brand_image = "/images/avatar_square.png"
     # og_image = ""                             # path to social icon - front matter: image takes precedent, then og_image, then brand_url
     # publisher_icon = ""                       # path to publisher icon - defaults to favicon, used in schema
-    # favicon = ""                              # path to favicon
+    favicon = "favicon.ico"                              # path to favicon
     # description = "Update this description..."  # Used as default meta description if not specified in front matter
     dark_mode = true
 
@@ -32,7 +32,7 @@ disqus_url = 'https://poison.lukeorth.com'
     rss_section = "posts"
 
     # sidebar
-    sidebar_bg_color = "#ede3d3"            # default is #202020
+    sidebar_bg_color = "#ebd06e"            # default is #202020
     sidebar_img_border_color = "#515151"    # default is #515151
     sidebar_p_color = "#333131"             # default is #909090
     sidebar_h1_color = "#065ba1"               # default is #FFF
@@ -43,7 +43,7 @@ disqus_url = 'https://poison.lukeorth.com'
 
     # light mode
     text_color = "#222"             # default is #222
-    content_bg_color = "#FAF9F6"    # default is #FAF9F6
+    content_bg_color = "#f5f1e4"    # default is #FAF9F6
     post_title_color = "#303030"    # default is #303030
     list_color = "#5a5a5a"          # default is #5a5a5a
     link_color = "#268bd2"          # default is #268bd2
@@ -53,7 +53,7 @@ disqus_url = 'https://poison.lukeorth.com'
 
     # dark mode
     text_color_dark = "#eee"            # default is #eee
-    content_bg_color_dark = "#121212"   # default is #121212
+    content_bg_color_dark = "#474231"   # default is #121212
     post_title_color_dark = "#DBE2E9"   # default is #DBE2E9
     list_color_dark = "#9d9d9d"         # default is #9d9d9d
     link_color_dark = "#268bd2"         # default is #268bd2

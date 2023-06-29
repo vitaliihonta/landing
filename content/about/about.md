@@ -1,20 +1,24 @@
 ---
 title: "About"
-date: 2022-11-30T15:04:46-06:00
+date: 2023-06-29T15:04:46+02:00
 draft: false
 ---
 
-___
-*Words kill, words give life; they’re either **poison** or fruit—you choose.*
+Hello there, my name is Vitalii 👋
+I’m passionate about software engineering (especially Scala, but also like Python).
 
-*--- Proverbs 18:21*
-___
+The things I feel the most interested in are Functional Programming,
+Data Engineering, Distributed Systems in general, Workflow Management Systems, etc.
 
-*Poison* is a **clean**, **professional** Hugo theme designed to **captivate** your readers.
+I believe software engineering (and functional programming in particular) should be:
+- **Principled** but **practical**
+- **Pragmatic** enough but still **enjoyable**
+- **Inclusive** and **welcoming** for newcomers!
 
-It's also **tiny** and **privacy conscious** with *no external dependencies*.  That's right---no JavaScript frameworks, icon packs, or Google fonts.  No ads or trackers polluting your console window (try it out and take a look).  **We kept things simple**.  A little vanilla JavaScript, a dash of CSS, and the power of Hugo.
+Following these credos, I authored some open source projects:
+- **[ZIO Temporal](https://zio-temporal.vhonta.dev/)**
+- **[Scala QL](https://scala-ql.vhonta.dev/)**
+- ...and more.  
 
-All of the static assets for the site (JS files, CSS, and fonts) are located within the theme's */static/* directory.  **That way you know *exactly* what's going on your site**.
-
-To get started, I recommend reading through my introductory post [here]({{< ref "/posts/introducing-poison.md" >}}).  I use this theme on my personal site at https://lukeorth.com, so check it out if you want to see *Poison* in action.
-
+This is my personal blog.  
+Also, sometimes I give talks at software engineering conferences, and they will be posted here 🙂
