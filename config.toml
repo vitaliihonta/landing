@@ -1,4 +1,4 @@
-baseURL = 'https://vhonta.dev/'
+baseURL = '/'
 languageCode = 'en-us'
 title = "Vitalii Honta"
 theme = "poison"
