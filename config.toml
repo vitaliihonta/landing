@@ -1,4 +1,4 @@
-baseURL = '/'
+baseURL = 'https://vhonta.dev/'
 languageCode = 'en-us'
 title = "Vitalii Honta"
 theme = "poison"
@@ -10,10 +10,6 @@ disqus_url = 'https://poison.lukeorth.com'
 [params]
     brand = "Vitalii Honta"
     brand_image = "/images/avatar_square.png"
-    # og_image = ""                             # path to social icon - front matter: image takes precedent, then og_image, then brand_url
-    # publisher_icon = ""                       # path to publisher icon - defaults to favicon, used in schema
-    favicon = "favicon.ico"                              # path to favicon
-    # description = "Update this description..."  # Used as default meta description if not specified in front matter
     dark_mode = true
 
     menu = [
@@ -61,9 +57,6 @@ disqus_url = 'https://poison.lukeorth.com'
     table_border_color_dark = "#515151" # default is #515151
     table_stripe_color_dark = "#202020" # default is #202020
 
-
-[params.meta]
-    favicon = true
 [taxonomies]
     series = 'series'
     tags = 'tags'
