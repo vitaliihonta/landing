@@ -1,6 +1,7 @@
 baseURL = '/'
 languageCode = 'en-us'
 title = "Vitalii Honta"
+description = "Hello there, my name is Vitalii. Welcome to my personal blog 👋"
 theme = "poison"
 paginate = 10
 pluralizelisttitles = false
@@ -10,6 +11,7 @@ disqus_url = 'https://poison.lukeorth.com'
 [params]
     brand = "Vitalii Honta"
     brand_image = "/images/avatar_square.png"
+    image = "/images/site-feature-image.png"
     dark_mode = true
 
     menu = [

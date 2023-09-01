@@ -1,5 +1,6 @@
 ---
 title: "About"
+description: "Hello there, my name is Vitalii. Welcome to my personal blog 👋"
 date: 2023-06-29T15:04:46+02:00
 draft: false
 ---

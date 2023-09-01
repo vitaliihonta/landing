@@ -1,13 +1,15 @@
 ---
 title: "Temporal Workflows with ZIO: Introduction"
+description: "Meet Temporal - a distributed workflow management system for building invincible apps. In this series of articles, you will see how to solve real business problems using the concept of Workflows"
 date: 2023-09-01T10:00:00+02:00
 series: "Temporal Workflows with ZIO"
 draft: false
 tags: ["Temporal", "ZIO"]
+og_image: "images/site-feature-image.png"
 ---
 
 ## Introduction
-Do you spend a lot of time making your applications resilient? Dealing with distributed state and locks? Migrating from sync to async communication? Adding retries, tracing?  
+Do you spend a lot of time making your applications resilient: dealing with distributed state and locks, migrating from sync to async communication, adding retries, tracing?
 
 That's a usual programming routine that we, as engineers, must care about. On the other hand, it shifts our focus to technical issues instead of the original business problem.  
 
@@ -96,7 +98,7 @@ Therefore, it is important for the Workflow logic to act deterministically so th
 
 ## Content Sync Architecture
 Now we can go back to the business task.  
-Let's jump ahead a little to the Content sync platform architecture using Temporal!
+Let's get ahead a little to the Content sync platform architecture using Temporal!
 ![Content sync architecture](/images/content_sync_architecture.jpg)
 
 Important notes here:
