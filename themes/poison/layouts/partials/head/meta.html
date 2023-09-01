@@ -58,6 +58,9 @@
 <meta itemprop="description" content="{{ .Scratch.Get "description" }}" />
 <meta property="og:description" content="{{ .Scratch.Get "description" }}" />
 <meta name="twitter:description" content="{{ .Scratch.Get "description" }}" />
+{{ if .Params.tags }}
+<meta name="keywords" content="{{ with .Params.tags }}{{ delimit . ", "}}{{ end }}" />
+{{ end }}
 
 <!-- Link Tags -->
 <base href="{{ .Permalink }}" />
