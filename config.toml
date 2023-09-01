@@ -11,7 +11,8 @@ disqus_url = 'https://poison.lukeorth.com'
 [params]
     brand = "Vitalii Honta"
     brand_image = "/images/avatar_square.png"
-    image = "https://vhonta.dev/images/avatar_square.png"
+    # todo: set to vhonta.dev
+    image = "https://blog-zio-temporal-intro.vhonta.pages.dev/images/site-feature-image.png"
     dark_mode = true
 
     menu = [
