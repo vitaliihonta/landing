@@ -9,13 +9,13 @@ tags: ["Temporal", "ZIO"]
 ## Introduction
 Do you spend a lot of time making your applications resilient? Dealing with distributed state and locks? Migrating from sync to async communication? Adding retries, tracing?  
 
-That's a usual programming routine that we, as engineers, must care about. On the other hand, it shifts our focus to technical issues instead of the original bussiness problem.  
+That's a usual programming routine that we, as engineers, must care about. On the other hand, it shifts our focus to technical issues instead of the original business problem.  
 
-Can we change the status quo? Are there any tools or instruments to help us struggle less and to be more productive?  
+Can we change the status quo? Are there any tools to help us struggle less and to be more productive?  
 
 Meet [Temporal](https://temporal.io) — a distributed workflow management system for building invincible apps. It handles most technical problems, such as scaling, transactivity, managing state, etc. Temporal lets you focus on business needs and produce value quickly.  
 
-[ZIO Temporal](https://zio-temporal.vhonta.dev/) is a *Scala SDK* for Temporal implemented with [ZIO](https://zio.dev). It allows working with Temporal naturally (like it was developed for Scala). It handles most typical programmer errors at compile time. It also brings seamless ZIO interop!
+[ZIO Temporal](https://zio-temporal.vhonta.dev/) is a *Scala SDK* for Temporal implemented with [ZIO](https://zio.dev). It allows working with Temporal naturally as though it was developed for Scala. It handles most typical programmer errors at compile time. It also brings seamless ZIO interop!
 
 In this series of articles, you will see how to solve *kinda* real business problems using the concept of *Workflows*. 
 
@@ -44,7 +44,7 @@ Those components require:
 - *User session store* for internal application-level data (for UI-related functionality). 
 
 Taking those requirements into account, at the first glance, we might need:
-- Scheduler library like [Quartz](http://www.quartz-scheduler.org/) with a relation database for persistency
+- Scheduler library like [Quartz](http://www.quartz-scheduler.org/) with a relation database as the state store
 - File system for raw data
 - Relational database (such as Postgres) for processed data
 - Message Queue (like RabbitMQ or Apache Kafka) for intra-component communication
@@ -62,10 +62,9 @@ Temporal Application *implements* the business logic in terms of **Workflows**.
 Workflows are then executed by the **Temporal Server** that takes care of retries, persistency and so on.
 
 ### Workflow vs Activity
-Two main building parts of Temporal are **Workflow** and **Activity**.   
-
-**Workflow** is the business process definition represented as code.  
-**Activity** is all the hard work and technical details.  
+Two main building parts of Temporal are **Workflow** and **Activity**:
+1. **Workflow** is the business process definition represented as code.  
+2. **Activity** is all the hard work and technical details.  
 
 *Activities* perform error-prone operations (such as interactions with external systems and APIs), complex algorithms, etc. 
 *Workflows* implemented the business logic using *Activities*. A *Workflow* can also spawn and supervise *Child Workflows*.  
@@ -81,9 +80,12 @@ The *Workflow* logic is described with code, so you're free to use any construct
 ### Workflow execution
 Workflows are executed by the **Temporal Server**. 
 Client-side applications schedule Workflow execution via Temporal Server API.  
-*Temporal Server* then routes the Workflow to a **Task Queue** (specific by the client-side), so that a **Worker** application can pick it up.
+
+*Temporal Server* then routes the Workflow to a **Task Queue** (specific by the client-side), so that a **Worker** application can pick it up.  
+
 *Workers* execute the *Workflow* logic code. Whenever a *Workflow needs* to execute an *Activity* (or *Child Workflow*), the *Temporal Server* executes it (via the same Worker or another one) and **stores the result** in the *Event storage* (usually a database).  
-*Workflow* can suspend its execution for some time until a *Singal* received or a certain condition is met. The *Worker* doesn't waste resources while a *Workflow* execution is suspended.  
+
+*Workflow* can suspend its execution for some time until a *Singal* is received or a certain condition is met. The *Worker* doesn't waste resources while a *Workflow* execution is suspended.  
 
 This is a very powerful approach, allowing reliable retries of failed *Workflows*. 
 For instance, in case the *Workflows* invokes two *Activities*, if the *first Activity* invocation succeeds, but the *second* one fails, **only the second is retried**. Remember, the result of the first Activity invocation is persisted into an event storage, so there is no need to retry the entire *Workflow*. The same logic applies to *Child Workflows*.
