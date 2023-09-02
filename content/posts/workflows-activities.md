@@ -22,6 +22,7 @@ Let's get started!
 Workflows are the basic building blocks in Temporal.
 A Workflow Definition contains the actual business logic. It's determenistic, those free from any side effects.
 
+Basic interface sample:
 ```scala
 import zio._
 import zio.temporal._
@@ -36,5 +37,25 @@ trait EchoWorkflow {
 }
 ```
 
+Basic implementation:
+
+```scala
+class EchoWorkflowImpl extends EchoWorkflow {
+  override def echo(str: String): String = {
+    println(s"Echo: $str")
+    str
+  }
+}
+
+def createWorkflowStub(workflowClient: ZWorkflowClient): UIO[ZWorkflowStub.Of[EchoWorkflow]] = 
+  workflowClient
+    .newWorkflowStub[EchoWorkflow]
+    .withTaskQueue("echo-queue")
+    .withWorkflowId("<unique-workflow-id>")
+    .withWorkflowRunTimeout(10.second)
+    .build
+```
+
+
 ## Reference
-- [Workflow documentation](https://docs.temporal.io/workflows)
+- [Workflows overview](https://zio-temporal.vhonta.dev/docs/core/workflows)

@@ -63,3 +63,7 @@ disqus_url = 'https://poison.lukeorth.com'
 [taxonomies]
     series = 'series'
     tags = 'tags'
+
+[markup]
+    [markup.highlight]
+        style = 'onedark'
