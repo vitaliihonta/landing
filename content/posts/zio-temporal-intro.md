@@ -5,7 +5,6 @@ date: 2023-09-01T10:00:00+02:00
 series: "Temporal Workflows with ZIO"
 draft: false
 tags: ["Temporal", "ZIO"]
-og_image: "images/site-feature-image.png"
 ---
 
 ## Introduction
