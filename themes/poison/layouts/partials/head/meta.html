@@ -74,8 +74,9 @@
 <meta name="twitter:site" content="{{ .Site.Params.twitter_url }}" />
 <meta name="twitter:creator" content="{{ .Site.Params.twitter_url }}" />
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{{ .Site.Params.image }}" />
-<meta name="twitter:image:src" content="{{ .Site.Params.image }}" />
+<meta name="twitter:image" content="{{ absURL .Site.Params.image }}" />
+<meta name="twitter:image:src" content="{{ absURL .Site.Params.image }}" />
+<meta name="og:image" content="{{ absURL .Site.Params.image }}" />
 <meta property="fb:admins" content="{{ .Site.Params.fb.admins }}" />
 
 <!-- Image Tags -->
