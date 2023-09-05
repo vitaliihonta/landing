@@ -16,6 +16,8 @@ Can we change the status quo? Are there any tools to help us struggle less and t
 
 Meet [Temporal](https://temporal.io) — a distributed workflow management system for building invincible apps. It handles most technical problems, such as scaling, transactivity, managing state, etc. Temporal lets you focus on business needs and produce value quickly.  
 
+*Temporal Applications* are written using Temporal SDK targetting most mainstream languages, such as Java, Python, Go, JavaScript and so on. 
+
 [ZIO Temporal](https://zio-temporal.vhonta.dev/) is a *Scala SDK* for Temporal implemented with [ZIO](https://zio.dev). It allows working with Temporal naturally as though it was developed for Scala. It handles most typical programmer errors at compile time. It also brings seamless ZIO interop!
 
 In this series of articles, you will see how to solve *kinda* real business problems using the concept of *Workflows*. 
@@ -25,7 +27,6 @@ In this series of articles, you will see how to solve *kinda* real business prob
 We're going to develop a **Content synchronization platform** (let's call it the **content sync app**).  
 **TL;DR** the source code is already available on [GitHub](https://github.com/vitaliihonta/zio-temporal-samples/tree/main/content-sync)
 
-### User story
 **As a regular person**, I struggle to check various sources of content (newsletters, videos on YouTube, etc). I wish there were an aggregator fetching *content I want* and making recommendations for me. For instance, a [Telegram Bot](https://telegram.org/faq#bots)
 
 ### Technical details
@@ -63,33 +64,42 @@ Temporal Application *implements* the business logic in terms of **Workflows**.
 Workflows are then executed by the **Temporal Server** that takes care of retries, persistency and so on.
 
 ### Workflow vs Activity
-Two main building parts of Temporal are **Workflow** and **Activity**:
-1. **Workflow** is the business process definition represented as code.  
-2. **Activity** is all the hard work and technical details.  
+Two main building parts of Temporal are **Activity** and **Workflow**:
+1. **Activity** is all the hard work and technical details. *Activities* perform error-prone operations (such as interactions with external systems and APIs), complex algorithms, etc.  
+2. **Workflow** is the business process definition represented as code. 
+*Workflows* implement the business logic using *Activities*. A *Workflow* can also spawn and supervise *Child Workflows*.  
 
-*Activities* perform error-prone operations (such as interactions with external systems and APIs), complex algorithms, etc. 
-*Workflows* implemented the business logic using *Activities*. A *Workflow* can also spawn and supervise *Child Workflows*.  
-
-### Workflow particles
-The *Workflow* consists of the following particles:
-1. **Workflow method** that executes the whole business logic
-2. **Signal method** that allows to interact with a running workflow from the outside
+### Workflow definition
+The *Workflow* definition consists of the following particles:
+1. **Workflow method** that contains the business logic. **It is mandatory** for the Workflow definition, while other methods are optional. 
+2. **Signal method** that allows to interact with a running workflow from the outside. Workflow definition may have zero or multiple signal methods defined.
 3. **Query method** that allows inspecting the business process state
 
-The *Workflow* logic is described with code, so you're free to use any constructs of your favorite programming language as long as it is **Deterministic** (we will talk about this later).
+The *Workflow* is defined using the methods above. They are implemented with code, using the Temporal SDK targetting your programming language. You're free to use any constructs of your favorite programming language as long as it is **Deterministic** (we will talk about this later).
 
 ### Workflow execution
-Workflows are executed by the **Temporal Server**. 
-Client-side applications schedule Workflow execution via Temporal Server API.  
+Workflows are executed by the **Temporal Cluster**. The Cluster consists of multiple internal components:
+- External database (like PostgreSQL, MySQL, Cassandra, or SQLite for local development)
+- Internal message queue
+- Components responsible for task management and observability- 
+- Server API for Workflow Scheduling
+- Web UI
+
+You can find more information about the Temporal Cluster and how it is deployed in the [official Temporal Cluster documentation](https://docs.temporal.io/clusters).
+
+Typically, the *Temporal Application* consists of the **Client-side** and the **Worker**.
+
+*Client-side* applications schedule Workflow execution using Temporal SDK via the Temporal Server API. 
 
 *Temporal Server* then routes the Workflow to a **Task Queue** (specific by the client-side), so that a **Worker** application can pick it up.  
 
-*Workers* execute the *Workflow* logic code. Whenever a *Workflow needs* to execute an *Activity* (or *Child Workflow*), the *Temporal Server* executes it (via the same Worker or another one) and **stores the result** in the *Event storage* (usually a database).  
+*Workers* execute the *Workflow* code written with the Temporal SDK. 
+Whenever a *Workflow needs* to execute an *Activity* (or *Child Workflow*), the *Temporal Server* finds a suitable Worker to execute it (could be the same or another Worker) and **stores the result** in the *Event storage* (the database).  
 
 *Workflow* can suspend its execution for some time until a *Singal* is received or a certain condition is met. The *Worker* doesn't waste resources while a *Workflow* execution is suspended.  
 
 This is a very powerful approach, allowing reliable retries of failed *Workflows*. 
-For instance, in case the *Workflows* invokes two *Activities*, if the *first Activity* invocation succeeds, but the *second* one fails, **only the second is retried**. Remember, the result of the first Activity invocation is persisted into an event storage, so there is no need to retry the entire *Workflow*. The same logic applies to *Child Workflows*.
+For instance, in case the *Workflow* invokes two *Activities*, if the *first Activity* invocation succeeds, but the *second* one fails, **only the second is retried**. Remember, the result of the first Activity invocation is persisted into an event storage, so there is no need to retry the entire *Workflow*. The same logic applies to *Child Workflows*.
 
 Let's go back to the *Determinism restriction* for the Workflow logic. In case of failures, the Workflow execution will be retried by the Temporal Server. The steps that succeeded won't be re-executed (as stated above). Instead, the Workflow code will operate with the results from the Event storage.  
 Therefore, it is important for the Workflow logic to act deterministically so that the flow goes the same way given historical events.  
