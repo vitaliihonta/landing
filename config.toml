@@ -8,10 +8,15 @@ pluralizelisttitles = false
 disqusShortname = 'poison'
 disqus_url = 'https://poison.lukeorth.com'
 
+[params.image]
+    url = "/images/cover.png"
+    width = 512
+    height = 512
+
 [params]
     brand = "Vitalii Honta"
     brand_image = "/images/avatar_square.png"
-    image = "/images/cover.png"
+
     dark_mode = true
 
     menu = [
