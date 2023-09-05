@@ -1,7 +1,7 @@
 ---
 title: "Temporal Workflows with ZIO: Introduction"
 description: "Meet Temporal - a distributed workflow management system for building invincible apps. In this series of articles, you will see how to solve real business problems using the concept of Workflows"
-date: 2023-09-01T10:00:00+02:00
+date: 2023-09-05T10:00:00+02:00
 series: "Temporal Workflows with ZIO"
 draft: false
 tags: ["Temporal", "ZIO"]
