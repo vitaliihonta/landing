@@ -71,23 +71,14 @@
 
 
 <!-- Social Media Tags -->
+<meta itemprop="image" content="{{ absURL .Site.Params.image }}" />
+<meta name="og:image" content="{{ absURL .Site.Params.image }}" />
 <meta name="twitter:site" content="{{ .Site.Params.twitter_url }}" />
 <meta name="twitter:creator" content="{{ .Site.Params.twitter_url }}" />
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ absURL .Site.Params.image }}" />
 <meta name="twitter:image:src" content="{{ absURL .Site.Params.image }}" />
-<meta name="og:image" content="{{ absURL .Site.Params.image }}" />
 <meta property="fb:admins" content="{{ .Site.Params.fb.admins }}" />
-
-<!-- Image Tags -->
-{{ if $og_image }}
-<meta itemprop="image" content="{{ $og_image.Permalink }}" />
-<meta property="og:image" content="{{ $og_image.Permalink }}" />
-<meta property="og:image:width" content="{{ $og_image.Width }}" />
-<meta property="og:image:height" content="{{ $og_image.Height }}" />
-<meta name="twitter:image" content="{{ $og_image.Permalink }}" />
-<meta name="twitter:image:src" content="{{ $og_image.Permalink }}" />
-{{ end }}
 
 <!-- Date Tags -->
 <meta property="og:updated_time" content={{ .Lastmod.Format "2001-02-03T14:05:06Z0700" | safeHTML }} />
