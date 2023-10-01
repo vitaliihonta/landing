@@ -27,36 +27,91 @@ The command spawns a local *Temporal* instance. It doesn't require any dependenc
 Let's get started!
 
 ## Before we start
-First, install *ZIO Temporal* locally via your favorite tool. In this example, I'm using *SBT*:
-```scala
-libraryDependencies ++= Seq(
-  // Core
-  "dev.vhonta" %% "zio-temporal-core" % "0.6.0",
-  // Protobuf transport
-  "dev.vhonta" %% "zio-temporal-protobuf" % "0.6.0",
-  "dev.vhonta" %% "zio-temporal-protobuf" % "0.6.0" % "protobuf",
-  // Testkit
-  "dev.vhonta" %% "zio-temporal-testkit" % "0.6.0"
-)
-```
-
-
-# Pulling content
 You'll develop the Content Sync platform starting with the component that fetches videos from YouTube via its API.  
-We must add a few more dependencies to implement it:
+
+**Disclaimer**: the original YouTube puller code is much complicated as it implements more functionality (e.g., supporting multiple content sources in a generic way) and it manages the integration configuration per user. It's is not necessary to dive into such details from start, so you'll ommit it.  
+
+TODO improve
+
+## YouTube Puller
+During the tutorial, you will implement the YouTube puller. It is non-trivial, so you have to install some dependencies.  
+You will use [Scala CLI](https://scala-cli.virtuslab.org/) as it allows to run the example easily. The final code is published in this [Github Gist](https://gist.github.com/vitaliihonta/3b1d6ea96422caef5ea11af03281ad77).  
+
+TODO add links
+
+The functionality you're implementing consists of the following steps:
+1. Fetching data from YouTube. 
+    - YouTube Java SDK is required to perform API requests.
+    - ZIO Streams will help you to deal with data flows a lot
+2. Converting data into a format common for all possible content sources.
+    - Enumeratum is a must have as you're wokring with Scala 2.13
+3. Storing data in the file system.
+    - In real life, it's would be a distributed file system like HDFS or AWS S3. In the example, you're going to use local file system.
+    - A common data format used in data engineering is Parquet. In case you have to serialize data into parquet, I strongly recommend using [Parquet4s](https://github.com/mjakubowski84/parquet4s) library which the original Content Sync platform code uses. However, for simplification, we'll store data into a local file system serialized into JSON. Therefore, we're going to use ZIO JSON.
+    - ZIO NIO helps reliably writing data into files.
+
+Finally, you must add *ZIO Temporal* itself 😎
+
+The final list of dependencies looks like the this:
 ```scala
-libraryDependencies ++= Seq(
-  // ZIO Streams
-  "dev.zio"  %% "zio-streams" % "2.0.18",
-  // ZIO/Java NIO interop
-  "dev.zio" %% "zio-nio" % "2.0.2",
-  // Google SDKs
-  "com.google.api-client" % "google-api-client" % "2.2.0",
-  "com.google.apis" % "google-api-services-youtube" % "v3-rev20230502-2.0.0"
-)
+//> using scala 2.13
+//> using dep dev.vhonta::zio-temporal-core:0.6.0
+//> using dep dev.zio::zio:2.0.18
+//> using dep dev.zio::zio-streams:2.0.18
+//> using dep dev.zio::zio-nio:2.0.2
+//> using dep dev.zio::zio-json:0.6.2
+//> using dep dev.zio::zio-logging:2.1.14
+//> using dep dev.zio::zio-logging-slf4j-bridge:2.1.14
+//> using dep com.beachape::enumeratum:1.7.3
+//> using dep com.google.api-client:google-api-client:2.2.0
+//> using dep com.google.apis:google-api-services-youtube:v3-rev20230502-2.0.0
 ```
 
-Before diving into Temporal, let's add the following `YoutubeClient` class to simplify further development. The implementation details are not neccessary for this article, so the methods are stubbed with testing data:
+### Domain model
+First, let's define a unified schema for content comming from various sources (along with the serialization logic):
+```scala mdoc
+import enumeratum.{Enum, EnumEntry}
+import java.time.LocalDateTime
+import zio.json._
+
+sealed trait ContentType extends EnumEntry
+case object ContentType extends Enum[ContentType] {
+  // The Content Sync currently supports only Text and Video
+  case object Text  extends ContentType
+  case object Video extends ContentType
+
+  override val values = findValues
+
+  // Define JSON serialization logic for enumeratum enums
+  implicit val jsonCodec: JsonCodec[ContentType] = {
+    JsonCodec(
+      JsonEncoder.string.contramap[ContentType](_.entryName),
+      JsonDecoder.string.mapOrFail(
+        ContentType.withNameEither(_).left.map(_.getMessage)
+      )
+    )
+  }
+}
+
+
+// The domain model for Content we pull and process
+@jsonMemberNames(SnakeCase)
+case class ContentFeedItem(
+  title:       String,
+  description: Option[String],
+  url:         String,
+  publishedAt: LocalDateTime,
+  contentType: ContentType)
+
+// Define JSON serialization logic for the case class
+object ContentFeedItem {
+  implicit val jsonCodec: JsonCodec[ContentFeedItem] = 
+    DeriveJsonCodec.gen[ContentFeedItem]
+}
+```
+
+### YouTube client
+The next step is to define a `YoutubeClient` class to simplify further development. The implementation details are not neccessary for this article, so the methods are stubbed with testing data:
 ```scala mdoc
 // A lot of YouTube Java API imports 
 import com.google.api.services.youtube.model.{
@@ -88,8 +143,7 @@ case class YoutubeClient(/**/) {
   def channelVideos(
     accessToken: String,
     channelId:   String,
-    minDate:     LocalDateTime,
-    maxResults:  Long
+    minDate:     LocalDateTime
   ): Stream[Throwable, SearchResult] = {
     ZStream.range(1, 10).mapZIO(_ => makeRandomVideo(channelId))
   }
@@ -121,25 +175,30 @@ case class YoutubeClient(/**/) {
       title   <- Random.nextString(10)
     } yield {
       new SearchResult()
-        .setId(new ResourceId().setVideoId(videoId.toString).setChannelId(channelId))
+        .setId(
+          new ResourceId()
+            .setVideoId(videoId.toString)
+            .setChannelId(channelId)
+        )
         .setSnippet(
           new SearchResultSnippet()
             .setTitle(title)
             .setDescription(s"Some description for video $videoId")
-            .setPublishedAt(new com.google.api.client.util.DateTime(1668294000000L))
+            .setPublishedAt(
+              new com.google.api.client.util.DateTime(1668294000000L)
+            )
         )
     }
   }
 }
 ``` 
 
-
 ## Activities
 In *ZIO Temporal* (and Java SDK it's based on), the Activity Definition concists of two parts.  
 
 The first one is **Activity Interface** - a *Scala trait* with a **@activityInterface** annotation. The Activity Interface can contain a many abstract methods as you need.  
 
-### YouTube puller
+### YouTube pulling activity
 Let's first start with the YouTube videos puller! 
 The goal of an activity is to perform error-prone operations. In this case, it will be interaction with an external API (YouTube).  
 TODO make a better intro.  
@@ -148,8 +207,7 @@ It's better to wrap activitie's input and output types into case classes. Let's 
 // Input
 case class FetchVideosParams(
     integrationId: Long,
-    minDate: LocalDateTime,
-    maxResults: Long,
+    minDate: LocalDateTime
 )
 
 // Output
@@ -178,7 +236,8 @@ trait YoutubeActivities {
 The `fetchVideos` method must fetch videos of the top 5 user's subscriptions. For simplification, we pick top 5 based on the video publication rate.  
 This is how the activity is implemented:
 ```scala mdoc
-// Step 1: define an internal state as we're going to loop over the subscriptions
+// Step 1: define an internal state as we're going to use 
+// while loop over the subscriptions
 case class FetchVideosState(
     subscriptionsLeft: List[YoutubeSubscription],
     accumulator: FetchVideosResult
@@ -215,18 +274,21 @@ case class YoutubeActivitiesImpl(
                             // Limit the number of subscriptions to reduce quota usage
                             val desiredSubscriptions = subscriptions
                               .sortBy(s =>
-                                Option(s.getContentDetails.getTotalItemCount.toLong)
-                                  .getOrElse(0L)
+                                Option(
+                                  s.getContentDetails.getTotalItemCount.toLong
+                                ).getOrElse(0L)
                               )(Ordering[Long].reverse)
                               .take(5)
                               .toList
 
                             FetchVideosState(
-                              subscriptionsLeft = desiredSubscriptions.map { subscription =>
-                                YoutubeSubscription(
-                                  channelId = subscription.getSnippet.getResourceId.getChannelId,
-                                  channelName = subscription.getSnippet.getTitle
-                                )
+                              subscriptionsLeft = desiredSubscriptions.map { 
+                                subscription =>
+                                  YoutubeSubscription(
+                                    channelId = subscription.getSnippet
+                                      .getResourceId.getChannelId,
+                                    channelName = subscription.getSnippet.getTitle
+                                  )
                               },
                               accumulator = FetchVideosResult(values = Nil)
                             )
@@ -237,12 +299,14 @@ case class YoutubeActivitiesImpl(
   }
 
   // Loop over subscriptions
-  private def process(params: FetchVideosParams)(state: FetchVideosState): Task[FetchVideosResult] = {
+  private def process(params: FetchVideosParams)(
+    state: FetchVideosState
+  ): Task[FetchVideosResult] = {
     // Finish if no more subscriptions left
     if (state.subscriptionsLeft.isEmpty) {
       ZIO.succeed(state.accumulator)
     } else {
-      val subscription :: rest  = state.subscriptionsLeft
+      val subscription :: rest = state.subscriptionsLeft
 
       val channelId = subscription.channelId
 
@@ -250,7 +314,11 @@ case class YoutubeActivitiesImpl(
         _ <- ZIO.logInfo(s"Pulling channel=$channelId name=${subscription.channelName} (channels left: ${rest.size})")
         // Fetch videos via API
         videos <- youtubeClient
-                    .channelVideos(youtubeAccessToken, channelId, params.minDate, params.maxResults)
+                    .channelVideos(
+                      youtubeAccessToken, 
+                      channelId, 
+                      params.minDate
+                    )
                     .runCollect
         
         // Convert videos into our domain classes 
@@ -258,10 +326,14 @@ case class YoutubeActivitiesImpl(
                             YoutubeSearchResult(
                               videoId = result.getId.getVideoId,
                               title = result.getSnippet.getTitle,
-                              description = Option(result.getSnippet.getDescription),
+                              description = Option(
+                                result.getSnippet.getDescription
+                              ),
                               publishedAt = {
                                 Instant
-                                  .ofEpochMilli(result.getSnippet.getPublishedAt.getValue)
+                                  .ofEpochMilli(
+                                    result.getSnippet.getPublishedAt.getValue
+                                  )
                                   .atOffset(ZoneOffset.UTC)
                                   .toLocalDateTime
                               }
@@ -271,7 +343,9 @@ case class YoutubeActivitiesImpl(
         // Update the state for the next iteration
         updatedState = state.copy(
           subscriptionsLeft = rest,
-          accumulator = state.accumulator.copy(values = state.accumulator.values ++ convertedVideos)
+          accumulator = state.accumulator.copy(
+            values = state.accumulator.values ++ convertedVideos
+          )
         )
         // Take a break to avoid being rate-limited by YouTube API
         _      <- ZIO.logInfo(s"Sleep for $pollInterval")
@@ -284,18 +358,20 @@ case class YoutubeActivitiesImpl(
 }
 ```
 
-To be continued...
+TODO describe activity implementation
 
 Finally, let's wrap the activity implementation into a `ZLayer` to use it later:
 ```scala mdoc
 object YoutubeActivitiesImpl {
   val make: URLayer[YoutubeClient with ZActivityRunOptions[Any], YoutubeActivities] =
-    ZLayer.fromFunction(YoutubeActivitiesImpl(_: YoutubeClient)(_: ZActivityRunOptions[Any]))
+    ZLayer.fromFunction(
+      YoutubeActivitiesImpl(_: YoutubeClient)(_: ZActivityRunOptions[Any])
+    )
 }
 ```
 
-### Data lake activity
-TODO introduce it
+### Data Lake activity
+The next step after pulling the data is storing it. Let's define an activity responsible for storing pulled data into the file system in JSON format.  
 
 Input and output:
 ```scala mdoc
@@ -319,19 +395,113 @@ trait DatalakeActivities {
 }
 ```
 
-TODO implement datalake activities
+Here is how the implementation looks like:
+```scala mdoc:silent
+// For configuration
+import java.net.URI
+// For file writes
+import java.io.IOException
+import zio._
+import zio.stream._
+import zio.json._
+import zio.nio.file.Files
+import zio.nio.file.Path
+
+
+case class DatalakeActivitiesImpl(
+  youtubeBaseUri:   URI
+)(implicit options: ZActivityRunOptions[Any])
+  extends DatalakeActivities {
+
+  override def storeVideos(
+    videos: YoutubeVideosList, 
+    params: StoreVideosParameters
+  ): Unit = {
+    ZActivity.run {
+      val contentFeedItemsStream = ZStream
+        .fromIterable(videos.values)
+        .map { video =>
+          ContentFeedItem(
+            title = video.title,
+            description = video.description,
+            url = youtubeBaseUri.toString + video.videoId,
+            publishedAt = video.publishedAt,
+            contentType = ContentType.Video
+          )
+        }
+
+      for {
+        _ <- ZIO.logInfo("Storing videos")
+        written <- writeStreamToJson(
+                     contentFeedItemsStream = contentFeedItemsStream,
+                     datalakeOutputDir = params.datalakeOutputDir,
+                     integrationId = params.integrationId
+                   )
+        _ <- ZIO.logInfo(s"Written $written videos")
+      } yield ()
+    }
+  }
+  
+  private def writeStreamToJson(
+    contentFeedItemsStream: UStream[ContentFeedItem],
+    datalakeOutputDir:      String,
+    integrationId:          Long
+  ): IO[IOException, Long] = {
+
+    def writeChunk(now: LocalDateTime)(
+      items: Chunk[ContentFeedItem]
+    ): IO[IOException, Long] = {
+      ZIO.scoped {
+        for {
+          uuid <- ZIO.randomWith(_.nextUUID)
+          // Create pull directory if not exists
+          dir = Path(datalakeOutputDir) / 
+                   s"pulledDate=$now" / 
+                   s"integration=$integrationId"
+          _ <- Files.createDirectories(dir)
+
+          // Write to a JSON lines file
+          path = dir / s"pull-$uuid.jsonl"
+          _ <- Files.writeLines(path, lines = items.map(_.toJson))
+        } yield items.size
+      }
+    }
+
+    for {
+      now <- ZIO.clockWith(_.localDateTime)
+      written <- contentFeedItemsStream
+                   .grouped(100)
+                   .mapZIO(writeChunk(now))
+                   .runSum
+    } yield written
+  }
+}
+
+// For dependency injection
+object DatalakeActivitiesImpl {
+  val make: URLayer[ZActivityRunOptions[Any], DatalakeActivities] =
+    // it's a good practice to read URI from a configuration file using ZIO Config capabilities
+    ZLayer.fromFunction(
+      DatalakeActivitiesImpl(new URI("https://www.youtube.com/watch?v="))(
+        _: ZActivityRunOptions[Any]
+      )
+    )
+}
+```
+
+TODO finish
 
 ## Workflows
 The Workflow Definition concists of two parts as well as the activity.  
 
 The first one is **Workflow Interface** - a *Scala trait* with a **@workflowInterface** annotation. The Workflow Interface must contain a single abstract method with a **@workflowMethod** annotation.  
 
+### Workflow Interface
 You start with defining Workflow input parameters and output results as case classes:
 ```scala mdoc
 case class YoutubePullerParameters(
     integrationId: Long,
     minDate: LocalDateTime,
-    maxResults: Long,
     datalakeOutputDir: String
 )
 
@@ -385,14 +555,13 @@ class YoutubePullWorkflowImpl extends YoutubePullWorkflow {
 
   override def pull(params: YoutubePullerParameters): PullingResult = {
     logger.info(
-      s"Getting videos integrationId=${params.integrationId} minDate=${params.minDate} maxResults=${params.maxResults}"
+      s"Getting videos integrationId=${params.integrationId} minDate=${params.minDate}"
     )
     val videos = ZActivityStub.execute(
       youtubeActivities.fetchVideos(
         FetchVideosParams(
           integrationId = params.integrationId,
-          minDate = params.minDate,
-          maxResults = params.maxResults
+          minDate = params.minDate
         )
       )
     )
@@ -417,6 +586,7 @@ class YoutubePullWorkflowImpl extends YoutubePullWorkflow {
   }
 }
 ```
+TODO: describe workflow logic better
 
 ### Scheduling Workflow Execution
 
@@ -430,18 +600,22 @@ An instance of **ZWorkflowClient** is used to interact with the Temporal Server,
 Retry policies can be configured using `ZRetryOptions`. 
 ```scala mdoc
 val retryOptions = ZRetryOptions.default
-  .withMaximumAttempts(5) // maximum retry attempts
-  .withInitialInterval(1.second) // initial backoff interval
-  .withBackoffCoefficient(0.5) // exponential backoff coefficiant
-  .withDoNotRetry(nameOf[IllegalArgumentException]) // do not retry certain errors 
+  // maximum retry attempts
+  .withMaximumAttempts(5)
+  // initial backoff interval
+  .withInitialInterval(1.second)
+  // exponential backoff coefficiant
+  .withBackoffCoefficient(1.2)
+  // do not retry certain errors 
+  .withDoNotRetry(nameOf[IllegalArgumentException])
 ```
 
 The configuration altoghether is specified using `ZWorkflowOptions`:
 ```scala mdoc
 val workflowOptions = ZWorkflowOptions
-  .withWorkflowId("<unique-workflow-id>")
-  .withTaskQueue("echo-queue")
-  .withWorkflowRunTimeout(10.second)
+  .withWorkflowId("youtube/23c86a79-0fc8-4ac7-b2bf-cc2974103a05")
+  .withTaskQueue("youtube-pulling-queue")
+  .withWorkflowRunTimeout(20.minutes)
   .withRetryOptions(retryOptions)
 ``` 
 
@@ -464,7 +638,6 @@ val runWorkflowAndPrintResult: RIO[ZWorkflowClient, Unit] =
         YoutubePullerParameters(
           integrationId = 1,
           minDate = LocalDateTime.of(2023, 1, 1, 0, 0),
-          maxResults = 1000,
           datalakeOutputDir = "./datalake"
         )
       )
@@ -510,13 +683,15 @@ TODO
 To make this implementation running *Workflow Executions*, you must create and register a *Worker*. You must specify the *task queue* for the *Worker* and provide *Workflow* implementations there. An instance of **ZWorkerFactory** is used to create *Worker* and register *Workflow implementations*:
 
 TODO register activities
-```scala mdoc
+```scala mdoc:silent
 import zio.temporal.worker._
 
-val registerWorker = 
+// Note that activities' dependencies are propagated
+val registerWorker: URIO[ZWorkerFactory with YoutubeClient with ZActivityRunOptions[Any] with Scope, ZWorker] = 
   ZWorkerFactory.newWorker("youtube-pulling-queue") @@
     ZWorker.addWorkflow[YoutubePullWorkflow].from(new YoutubePullWorkflowImpl) @@
-    ZWorker.addActivityImplementationLayer(YoutubeActivitiesImpl.make)
+    ZWorker.addActivityImplementationLayer(YoutubeActivitiesImpl.make) @@
+    ZWorker.addActivityImplementationLayer(DatalakeActivitiesImpl.make)
 ```
 *Side note*: creating a *Worker* is an *effect*, so the *aspect-based* syntax (*@@*) is used to configure the *Worker*. It allows avoiding syntactic noise of monadic composition and accessing ZIO's environment.
 
@@ -550,10 +725,21 @@ val workerProgram: RIO[Scope, Unit] =
   )
 ```
 
+## Temporal UI
+TODO add screenshots
+
+## What's next
+In the next post in the series, you're going get familiar with Workflow building parts, such as Query methods, Signal methods, etc.  
+They will allow you to implement a Workflow representing user interaction.  
+See you in the next part! 
 
 ## Reference
 - [Workflows overview](https://zio-temporal.vhonta.dev/docs/core/workflows)
 - [Activities overview](https://zio-temporal.vhonta.dev/docs/core/activities)
+- [Workers overview](https://zio-temporal.vhonta.dev/docs/core/workers)
 - [ZIO Temporal Configuration](https://zio-temporal.vhonta.dev/docs/core/configuration)
+- [ZIO Streams Documentation](https://zio.dev/reference/stream/)
 - [ZIO Scope](https://zio.dev/reference/resource/scope/)
+- [ZIO JSON Documentation](https://zio.dev/zio-json/)
+- [ZIO NIO Documentation](https://zio.dev/zio-nio/)
 - [Youtube Java API](https://developers.google.com/youtube/v3/quickstart/java)

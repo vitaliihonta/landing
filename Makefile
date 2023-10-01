@@ -21,6 +21,8 @@ mdoc:
 		  dev.zio:zio_2.13:$(ZIO_VERSION) \
 		  dev.zio:zio-streams_2.13:$(ZIO_VERSION) \
 		  dev.zio:zio-nio_2.13:2.0.2 \
+		  dev.zio:zio-json_2.13:0.6.2 \
+		  com.beachape:enumeratum_2.13:1.7.3 \
           com.google.api-client:google-api-client:2.2.0 \
           com.google.apis:google-api-services-youtube:v3-rev20230502-2.0.0 \
 	) \
