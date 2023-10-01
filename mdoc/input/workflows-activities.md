@@ -691,6 +691,8 @@ val startWorkflow: RIO[ZWorkflowClient, Unit] = ZIO.serviceWithZIO[ZWorkflowClie
         )
       )
     )
+
+    _ <- ZIO.logInfo("YouTube pull result workflow started!")
   } yield ()
 }
 ```
@@ -775,7 +777,19 @@ val workerProgram: RIO[Scope, Unit] =
 That's it! Once you run the worker program, it will start picking up workflows you previously scheduled for execution.  
 
 ## Temporal UI
-TODO add screenshots
+After you scheduled workflow execution and started the worker process, go ahead to Temporal UI on `http://localhost:8233`.  
+
+Once you open it, you'll see a list of workflow execution created on the Temporal Server:  
+
+![Workflows listing](/images/workflows-and-activities/workflows_list.png)
+
+You can navigate to workflow details by clicking on the workflow run. On this page, you'll see the information about the workflow, such as *Workflow ID*, *Task Queue*, *Workflow Type*, the input parameters and the workflow result (or error if it failed).  
+
+![Workflow details](/images/workflows-and-activities/workflow_details.png)
+
+Scroll down to see the *Workflow Execution History*. It contains a detailed log of activities invocation, activity input parameters, and activity results as well. The history also contains the number of retries performed (if any) and error stack traces if something fails.  
+
+![Workflow history](/images/workflows-and-activities/workflow_history.png)
 
 ## What's next
 In the next post in the series, you will get familiar with Workflow building parts, such as *Query methods*, *Signal methods*, etc.  

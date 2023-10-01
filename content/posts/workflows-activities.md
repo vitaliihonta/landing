@@ -664,7 +664,7 @@ val retryOptions = ZRetryOptions.default
 //   backoffCoefficient = Some(value = 1.2),
 //   maximumInterval = None,
 //   doNotRetry = ArraySeq("java.lang.IllegalArgumentException"),
-//   javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@3fcc58f8
+//   javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@472073bb
 // )
 ```
 
@@ -689,14 +689,14 @@ val workflowOptions = ZWorkflowOptions
 //       backoffCoefficient = Some(value = 1.2),
 //       maximumInterval = None,
 //       doNotRetry = ArraySeq("java.lang.IllegalArgumentException"),
-//       javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@3fcc58f8
+//       javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@472073bb
 //     )
 //   ),
 //   memo = Map(),
 //   searchAttributes = None,
 //   contextPropagators = List(),
 //   disableEagerExecution = None,
-//   javaOptionsCustomization = zio.temporal.workflow.ZWorkflowOptions$SetTaskQueue$$$Lambda$2074/0x0000000800ac7040@77e8492f
+//   javaOptionsCustomization = zio.temporal.workflow.ZWorkflowOptions$SetTaskQueue$$$Lambda$2074/0x0000000800ac7040@53bf791
 // )
 ``` 
 
@@ -722,6 +722,8 @@ val startWorkflow: RIO[ZWorkflowClient, Unit] = ZIO.serviceWithZIO[ZWorkflowClie
         )
       )
     )
+
+    _ <- ZIO.logInfo("YouTube pull result workflow started!")
   } yield ()
 }
 ```
@@ -729,8 +731,8 @@ val startWorkflow: RIO[ZWorkflowClient, Unit] = ZIO.serviceWithZIO[ZWorkflowClie
 Few important notes:
 1. `workflowClient.newWorkflowStub[YoutubePullWorkflow](workflowOptions)` returns an instance of `ZWorkflowStub.Of[YoutubePullWorkflow]`. *ZIO Temporal* provides you with a typed wrapper/stub to execute workflows.
     - Scheduling *Workflow Execution* requires network communication with the *Temporal Server*. Therefore, *Workflow Execution* arguments must be serialized an transfered over network
-    - Starting the *Workflow* looks like a method invocation but under the hood it's a remote call to the Temporal Server. Therefore, it's required to wrap the workflow method invocation into `ZWorkflowStub.start(...)` method. 
-    - `ZWorkflowStub.start` performs some compile-time checks for your code. For instance, it ensures you invoke the correct method (the one with `@workflowMethod` annotation). The method invocation is then transformed into a network call using low-level Java SDK primitives.
+    - Therefore, it's required to wrap the workflow method invocation into `ZWorkflowStub.start(...)` method. 
+    - `ZWorkflowStub.start` checks your code at compile-time. For instance, it ensures you invoke the correct method (the one with `@workflowMethod` annotation). The method invocation is then transformed into a remote call using low-level Java SDK primitives.
 2. `ZWorkflowStub.start` doesn't wait for the *Workflow* to be executed:
     - It returns immidietly once the Temporal Server schedules this workflow execution
     - If you want to wait for the *Workflow Execution* to finish, use `ZWorkflowStub.execute` method. It schedules the *Workflow Execution* and waits until it's picked up by a worker and executed. The method returns the workflow result in case of success (a `PullingResult` in our case) and the error details in case of failure.
@@ -806,7 +808,19 @@ val workerProgram: RIO[Scope, Unit] =
 That's it! Once you run the worker program, it will start picking up workflows you previously scheduled for execution.  
 
 ## Temporal UI
-TODO add screenshots
+After you scheduled workflow execution and started the worker process, go ahead to Temporal UI on `http://localhost:8233`.  
+
+Once you open it, you'll see a list of workflow execution created on the Temporal Server:  
+
+![Workflows listing](/images/workflows-and-activities/workflows_list.png)
+
+You can navigate to workflow details by clicking on the workflow run. On this page, you'll see the information about the workflow, such as *Workflow ID*, *Task Queue*, *Workflow Type*, the input parameters and the workflow result (or error if it failed).  
+
+![Workflow details](/images/workflows-and-activities/workflow_details.png)
+
+Scroll down to see the *Workflow Execution History*. It contains a detailed log of activities invocation, activity input parameters, and activity results as well. The history also contains the number of retries performed (if any) and error stack traces if something fails.  
+
+![Workflow history](/images/workflows-and-activities/workflow_history.png)
 
 ## What's next
 In the next post in the series, you will get familiar with Workflow building parts, such as *Query methods*, *Signal methods*, etc.  
