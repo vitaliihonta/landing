@@ -1,6 +1,6 @@
 ---
 title: "Working with Workflows and Activities"
-date: 2023-09-30T10:00:00+02:00
+date: 2023-10-02T21:30:00+02:00
 description: "Explore the essential components of Temporal: Workflows and Activities. Try to unlock the potential of orchestration using Temporal!"
 series: "Temporal Workflows with ZIO"
 draft: false
