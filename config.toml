@@ -48,7 +48,7 @@ disqus_url = 'https://poison.lukeorth.com'
     text_color = "#222"             # default is #222
     content_bg_color = "#f5f1e4"    # default is #FAF9F6
     post_title_color = "#303030"    # default is #303030
-    list_color = "#5a5a5a"          # default is #5a5a5a
+    list_color = "#222"          # default is #5a5a5a
     link_color = "#268bd2"          # default is #268bd2
     date_color = "#515151"          # default is #515151
     table_border_color = "#E5E5E5"  # default is #E5E5E5
@@ -58,7 +58,7 @@ disqus_url = 'https://poison.lukeorth.com'
     text_color_dark = "#eee"            # default is #eee
     content_bg_color_dark = "#474231"   # default is #121212
     post_title_color_dark = "#DBE2E9"   # default is #DBE2E9
-    list_color_dark = "#9d9d9d"         # default is #9d9d9d
+    list_color_dark = "#eee"         # default is #9d9d9d
     link_color_dark = "#268bd2"         # default is #268bd2
     date_color_dark = "#9a9a9a"         # default is #9a9a9a
     table_border_color_dark = "#515151" # default is #515151
@@ -67,3 +67,7 @@ disqus_url = 'https://poison.lukeorth.com'
 [taxonomies]
     series = 'series'
     tags = 'tags'
+
+[markup]
+    [markup.highlight]
+        style = 'onedark'
