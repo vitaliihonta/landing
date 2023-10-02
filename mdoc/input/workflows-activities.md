@@ -1,7 +1,7 @@
 ---
 title: "Working with Workflows and Activities"
 date: 2023-09-30T10:00:00+02:00
-description: "Unlock the potential of orchestration using Temporal! In this blog post, you'll explore the essential components of Temporal: Workflows and Activities."
+description: "Unlock the potential of orchestration using Temporal! In this blog post, we'll explore the essential components of Temporal: Workflows and Activities."
 series: "Temporal Workflows with ZIO"
 draft: false
 tags: ["Temporal", "ZIO"]
@@ -10,13 +10,13 @@ tags: ["Temporal", "ZIO"]
 ## Introduction
 In the previous post, you were introduced to [Temporal](https://temporal.io) and its main building blocks, [ZIO Temporal](https://zio-temporal.vhonta.dev), and the Content Sync Platform we're developing.
 
-In this post, you will develop your own Workflows and Activities!  
-A quick reminder about what them:  
+In this post, we'll develop your own Workflows and Activities!  
+A quick reminder:  
 1. **Activity** is all the hard work and technical details. *Activities* perform error-prone operations (such as interactions with external systems and APIs), complex algorithms, etc.  
 2. **Workflow** is the business process definition represented as code. 
 *Workflows* implement the business logic using *Activities*. A *Workflow* can also spawn and supervise *Child Workflows*. 
 
-To this guide, you must have a *Temporal Cluster* running. It's recommended to run a local instance using [Temporal CLI](https://docs.temporal.io/cli):
+As a prerequisite, you must have a *Temporal Cluster* running. It's recommended to run a local instance using [Temporal CLI](https://docs.temporal.io/cli):
 
 ```shell
 temporal server start-dev
@@ -29,13 +29,13 @@ Let's get started!
 ## Before we start
 You'll develop the Content Sync platform, starting with the component that fetches videos from YouTube via its API.  
 
-**Disclaimer**: the original YouTube puller code is much more complicated as it implements more functionality (e.g., supporting multiple content sources in a generic way), and it manages the integration configuration per user. It is not necessary to dive into such details from the start, so you'll omit it.  
+**Disclaimer**: the original YouTube puller code is much more complicated as it implements more functionality (e.g., supporting multiple content sources in a generic way), and it manages the integration configuration per user. It is not necessary to dive into such details from the start, so we'll omit it.  
 
 Let's focus on the Activities and Workflows basics. You'll learn how they help solve real problems!  
 
 ## YouTube Puller
-During the tutorial, you will implement the YouTube puller. It is non-trivial, so you have to install some dependencies.  
-You will use [Scala CLI](https://scala-cli.virtuslab.org/) as it allows you to run the example easily. The final code is published in this [Github Gist](https://gist.github.com/vitaliihonta/3b1d6ea96422caef5ea11af03281ad77).  
+During the tutorial, we'll implement the YouTube puller. It is non-trivial, so you have to install some dependencies.  
+The final code is published in this [Github Gist](https://gist.github.com/vitaliihonta/3b1d6ea96422caef5ea11af03281ad77). The example uses [Scala CLI](https://scala-cli.virtuslab.org/) as it allows to run the example easily. You should either [install Scala CLI](https://scala-cli.virtuslab.org/install/) or adapt the example for your favorite build tool.  
 
 The functionality you're implementing consists of multiple steps. All of them require [ZIO Temporal](https://zio-temporal.vhonta.dev/).  
 Let's follow the implementation steps and collect the list of other dependencies:
@@ -45,8 +45,8 @@ Let's follow the implementation steps and collect the list of other dependencies
 2. Converting data into a format common for all possible content sources.
     - Enumeratum is a must-have as you're working with Scala 2.13
 3. Storing data in the file system.
-    - In real life, it would be a distributed file system like HDFS or AWS S3. In the example, you'll going to use a local file system.
-    - A common data format used in data engineering is Parquet. However, for simplification, you'll produce data serialized into JSON. Therefore, we're going to use ZIO JSON.
+    - In real life, it would be a distributed file system like HDFS or AWS S3. In the example, we're going to use a local file system.
+    - A common data format used in data engineering is Parquet. However, for simplification, the puller will produce data serialized into JSON. Therefore, we're going to use ZIO JSON.
     - ZIO NIO helps reliably write data into files.
 
 It is also worth it to add ZIO Logging and [ZIO Logging SLF4J Bridge](https://zio.dev/zio-logging/slf4j1-bridge/) as Temporal Java SDK uses SLF4J under the hood.  
@@ -109,11 +109,11 @@ object ContentFeedItem {
 }
 ```
 
-The `ContentFeedItem` class represents the data the Content Sync platform processes and provides the user with.  
-Currently, the platform supports `Video` and `Text` content types. YouTube puller will produce `Video` content feed items.  
+The *ContentFeedItem* class represents the data the Content Sync platform processes and provides the user with.  
+Currently, the platform supports *Video* and *Text* content types. YouTube puller will produce *Video* content feed items.  
 
 ### YouTube client
-The next step is to define a `YoutubeClient` class. That is meant to be a wrapper for YouTube Java APIs to simplify further development. However, the implementation details are not necessary for this article so the methods are stubbed with testing data:
+The next step is to define a *YoutubeClient* class. That is meant to be a wrapper for YouTube Java APIs to simplify further development. However, the implementation details are not necessary for this article so the methods are stubbed with testing data:
 ```scala mdoc
 // A lot of YouTube Java API imports 
 import com.google.api.services.youtube.model.{
@@ -201,9 +201,9 @@ The data content doesn't really matter here. You should fill in only attributes 
 ## Activities
 In *ZIO Temporal* (and Java SDK it's based on), the Activity Definition consists of two parts.  
 
-The first one is **Activity Interface** - a *Scala trait* with a **@activityInterface** annotation. The Activity Interface can contain as many abstract methods as you need. The activity interface is then used by Workflows.  
+The first one is *Activity Interface* - a *Scala trait* with an *@activityInterface* annotation. The Activity Interface can contain as many abstract methods as you need. The activity interface is then used by Workflows.  
 
-Activities perform error-prone operations. Therefore, you'll implement interaction with the *YouTube API* and the *file system* using Activities. 
+Activities perform error-prone operations. Therefore, we'll implement interaction with the *YouTube API* and the *file system* using Activities. 
 
 ### YouTube pulling activity
 Our journey into activities starts with the YouTube video puller!  
@@ -239,9 +239,9 @@ trait YoutubeActivities {
 }
 ```
 
-The `fetchVideos` method must fetch videos based on the user's subscriptions. For simplification, we pick the top 5 based on the video publication rate.  
+The *fetchVideos* method must fetch videos based on the user's subscriptions. For simplification, we pick the top 5 based on the video publication rate.  
 
-Note that `fetchVideos` returns a pure value but not ZIO. It's necessary to define Activity Methods this way, otherwise, you won't be able to invoke Activities in Workflows.  
+Note that *fetchVideos* returns a pure value but not ZIO. It's necessary to define Activity Methods this way, otherwise, you won't be able to invoke Activities in Workflows.  
 
 Once the interface is defined, the next step is to implement the activity logic:
 ```scala mdoc
@@ -277,39 +277,43 @@ case class YoutubeActivitiesImpl(
      ZActivity.run {
        for {
          _ <- ZIO.logInfo(s"Fetching videos integration=${params.integrationId}")
-         // Populate the initial state for looping
-         // by fetching the subscriptions
-         initialState <- youtubeClient
+         // Fetching the subscriptions for the initial state
+         subscriptions <- youtubeClient
                           .listSubscriptions(youtubeAccessToken)
                           .runCollect
-                          .map { subscriptions =>
-                            // Limit the number of subscriptions to reduce quota usage
-                            val desiredSubscriptions = subscriptions
-                              .sortBy(s =>
-                                Option(
-                                  s.getContentDetails.getTotalItemCount.toLong
-                                ).getOrElse(0L)
-                              )(Ordering[Long].reverse)
-                              // Get top 5
-                              .take(5)
-                              .toList
-
-                            FetchVideosState(
-                              subscriptionsLeft = desiredSubscriptions.map { 
-                                subscription =>
-                                  YoutubeSubscription(
-                                    channelId = subscription.getSnippet
-                                      .getResourceId.getChannelId,
-                                    channelName = subscription.getSnippet.getTitle
-                                  )
-                              },
-                              accumulator = FetchVideosResult(values = Nil)
-                            )
-                          }
+         // Populate the initial state
+         initialState = createInitialState(subscriptions)
          // Start the loop
          result <- process(params)(initialState)
        } yield result
      }
+  }
+
+  private def createInitialState(
+    subscriptions: Chunk[Subscription]
+  ): FetchVideosState = {
+    // Limit the number of subscriptions to reduce quota usage
+    val desiredSubscriptions = subscriptions
+      .sortBy(s =>
+        Option(
+          s.getContentDetails.getTotalItemCount.toLong
+        ).getOrElse(0L)
+      )(Ordering[Long].reverse)
+      // Get top 5
+      .take(5)
+      .toList
+
+    FetchVideosState(
+      subscriptionsLeft = desiredSubscriptions.map { 
+        subscription =>
+          YoutubeSubscription(
+            channelId = subscription.getSnippet
+              .getResourceId.getChannelId,
+            channelName = subscription.getSnippet.getTitle
+          )
+      },
+      accumulator = FetchVideosResult(values = Nil)
+    )
   }
 
   // Loop over subscriptions
@@ -325,7 +329,9 @@ case class YoutubeActivitiesImpl(
       val channelId = subscription.channelId
 
       for {
-        _ <- ZIO.logInfo(s"Pulling channel=$channelId name=${subscription.channelName} (channels left: ${rest.size})")
+        _ <- ZIO.logInfo(
+          s"Pulling channel=$channelId name=${subscription.channelName} (channels left: ${rest.size})"
+        )
         // Fetch videos via API
         videos <- youtubeClient
                     .channelVideos(
@@ -373,13 +379,13 @@ case class YoutubeActivitiesImpl(
 ```
 
 Important notes:  
-- Use `ZActivity.run { ... }` to run ZIO inside activities. It "extracts" the value (or the error) from ZIO
-- In order to run ZIO, the `ZActivity.run` method requires an implicit `ZActivityRunOptions` available.
-- Under the hood, `ZActivityRunOptions[+R]` uses the `zio.Runtime[+R]` and Temporal Java SDK to complete the activity with ZIO's result
+- Use *ZActivity.run* method to run ZIO inside activities. It "extracts" the value (or the error) from ZIO
+- In order to run ZIO, the *ZActivity.run* method requires an implicit *ZActivityRunOptions* available.
+- Under the hood, *ZActivityRunOptions* uses the *ZIO Runtime* and *Temporal Java SDK* to complete the activity with ZIO's result
 
 It is worth it to note that fetching all the information about videos may take some time. Temporal allows activities to save a checkpoint with the latest fetching progress. You don't use this API right now, but we'll come back to it in the next articles.  
 
-Finally, let's wrap the activity implementation into a `ZLayer` to simplify the dependency injection later:
+Finally, let's wrap the activity implementation into a *ZLayer* to simplify the dependency injection later:
 ```scala mdoc
 object YoutubeActivitiesImpl {
   val make: URLayer[YoutubeClient with ZActivityRunOptions[Any], YoutubeActivities] =
@@ -391,7 +397,7 @@ object YoutubeActivitiesImpl {
 
 ### Data Lake activity
 The next step after pulling the data is storing it. The goal is to convert the raw data into our unified format and to store it in the file system as JSON lines files.
-Let's define an activity interface called `DatalakeActivities` along with its input and output:
+Let's define an activity interface called *DatalakeActivities* along with its input and output:
 ```scala mdoc
 // Input: list of videos to store
 case class YoutubeVideosList(
@@ -411,7 +417,7 @@ trait DatalakeActivities {
 }
 ```
 
-The activity just stores the data and it doesn't return anything. In this case, you can use `Unit` as the return type.  
+The activity just stores the data and it doesn't return anything. In this case, you can use *Unit* as the return type.  
 
 Let's implement the activity:
 ```scala mdoc:silent
@@ -506,7 +512,8 @@ case class DatalakeActivitiesImpl(
 // For dependency injection
 object DatalakeActivitiesImpl {
   val make: URLayer[ZActivityRunOptions[Any], DatalakeActivities] =
-    // NOTE: it's better to read URI from a configuration file using ZIO Config capabilities
+    // NOTE: it's better to read URI from a configuration file 
+    // using ZIO Config capabilities
     ZLayer.fromFunction(
       DatalakeActivitiesImpl(new URI("https://www.youtube.com/watch?v="))(
         _: ZActivityRunOptions[Any]
@@ -515,14 +522,14 @@ object DatalakeActivitiesImpl {
 }
 ```
 
-There is nothing important to note here regarding ZIO Temporal. As you can see, it's possible to run any ZIO code in activities if you wrap it into `ZActivity.run` block. The activity creates directories, writes data into files, etc.  
+There is nothing important to note here regarding ZIO Temporal. As you can see, it's possible to run any ZIO code in activities if you wrap it into *ZActivity.run* block. The activity creates directories, writes data into files, etc.  
 
 ## Workflows
 The Workflow Definition consists of two main parts as well as the activity.  
 
-The first one is **Workflow Interface** - a *Scala trait* with a **@workflowInterface** annotation. The Workflow Interface must contain a single abstract method with a **@workflowMethod** annotation.  
+The first one is *Workflow Interface* - a *Scala trait* with a *@workflowInterface* annotation. The Workflow Interface must contain a single abstract method with a *@workflowMethod* annotation.  
 
-You will implement a `YoutubePullWorkflow` that uses the Activities you defined to fetch YouTube videos and store them in the file system.  
+You will implement a *YoutubePullWorkflow* that uses the Activities you defined to fetch YouTube videos and store them in the file system.  
 
 ### Workflow Interface
 You start with defining Workflow input parameters and output results as case classes:
@@ -551,7 +558,7 @@ trait YoutubePullWorkflow {
 }
 ```
 
-The `pull` workflow method will trigger the data fetching process and will (eventually) store the data.  
+The *pull* workflow method will trigger the data fetching process and will (eventually) store the data.  
 
 This *Workflow Interface* is then used by the Client-side applications to schedule *Workflow Execution*.  
 The *Worker* must implement the interface to run scheduled *Workflow Executions*.  
@@ -627,25 +634,25 @@ class YoutubePullWorkflowImpl extends YoutubePullWorkflow {
 ```
 
 Important notes:
-- `ZWorkflow.newActivityStub` provides you with a stub that communicates to the Temporal cluster to invoke activities
-    - The method requires specifying the Activity Interface type and `ZActivityOptions`
-- You must always wrap the activity method invocation into `ZActivityStub.execute` method.
+- *ZWorkflow.newActivityStub* provides you with a stub that communicates to the Temporal cluster to invoke activities
+    - The method requires specifying the Activity Interface type and *ZActivityOptions*
+- You must always wrap the activity method invocation into *ZActivityStub.execute* method.
     - It's because there is no direct method invocation but a remote call to the Temporal Server
-    - The `ZActivityStub.Of[YoutubeActivities]` is a compile-time stub, so actual method invocations are only valid in compile-time
+    - The *ZActivityStub.Of[YoutubeActivities]* is a compile-time stub, so actual method invocations are only valid in compile-time
 - Activity method invocation result is persisted by Temporal into the event store (e.g., database like Postgres etc.)
 - Persisting the result allows the workflow to retry in case of any failures, starting from the closest successful activity invocation
 
 
 ### Scheduling Workflow Execution
 
-An instance of **ZWorkflowClient** interacts with the Temporal Server, including workflow scheduling. It's required to provide a few parameters for the Workflow Execution:
-1. **Task queue**  the execution is routed to (**mandatory**). Usually, different workflows are bound to different task queues so that you can deploy and scale workers listening to different task queues independently.
-2. **Workflow ID** is the unique identifier for the current Workflow Execution (**mandatory**). The *Workflow ID* is strongly recommended to be related to a business entity in your domain. The *Workflow ID* is the same among retries of the same *Workflow Execution*.
+An instance of *ZWorkflowClient* interacts with the Temporal Server, including workflow scheduling. It's required to provide a few parameters for the Workflow Execution:
+1. **Task queue**  the execution is routed to. Usually, different workflows are bound to different task queues so that you can deploy and scale workers listening to different task queues independently. The parameter is **mandatory**.
+2. **Workflow ID** is the unique identifier for the current Workflow Execution. The *Workflow ID* is strongly recommended to be related to a business entity in your domain. The *Workflow ID* is the same among retries of the same *Workflow Execution*. The parameter is **mandatory**.
 3. It is also a good practice to specify other options, such as 
     - Meaningful timeouts (like  **workflow run timeout** that limits the amount of time for a single workflow run attempt).
     - **Retry policies** (maximum number of timeouts, retry intervals, etc.)
 
-Retry policies are configured using `ZRetryOptions`:
+Retry policies are configured using *ZRetryOptions*:
 ```scala mdoc:silent
 val retryOptions = ZRetryOptions.default
   // maximum retry attempts
@@ -658,7 +665,7 @@ val retryOptions = ZRetryOptions.default
   .withDoNotRetry(nameOf[IllegalArgumentException])
 ```
 
-The configuration altogether is specified using `ZWorkflowOptions`. Besides the aforementioned parameters, you can specify various timeouts (such as *workflow run timeout*), etc.  
+The configuration altogether is specified using *ZWorkflowOptions*. Besides the aforementioned parameters, you can specify various timeouts (such as *workflow run timeout*), etc.  
 ```scala mdoc
 val workflowOptions = ZWorkflowOptions
   .withWorkflowId("youtube/23c86a79-0fc8-4ac7-b2bf-cc2974103a05")
@@ -670,42 +677,44 @@ val workflowOptions = ZWorkflowOptions
 Here is an example of scheduling a *Workflow Execution*:
 
 ```scala mdoc:silent
-val startWorkflow: RIO[ZWorkflowClient, Unit] = ZIO.serviceWithZIO[ZWorkflowClient] { workflowClient =>
-  for {
-    // Step 1: create a workflow stub
-    youtubePullWorkflow <- workflowClient.newWorkflowStub[YoutubePullWorkflow](
-                             workflowOptions
-                           )
-    // Step 2: start the workflow
-    _ <- ZWorkflowStub.start(
-      youtubePullWorkflow.pull(
-        // Provide input parameters
-        YoutubePullerParameters(
-          integrationId = 1,
-          minDate = LocalDateTime.of(2023, 1, 1, 0, 0),
-          datalakeOutputDir = "./datalake"
+val startWorkflow: RIO[ZWorkflowClient, Unit] = 
+  ZIO.serviceWithZIO[ZWorkflowClient] { workflowClient =>
+    for {
+      // Step 1: create a workflow stub
+      youtubePullWorkflow <- workflowClient
+                               .newWorkflowStub[YoutubePullWorkflow](
+                                  workflowOptions
+                               )
+      // Step 2: start the workflow
+      _ <- ZWorkflowStub.start(
+        youtubePullWorkflow.pull(
+          // Provide input parameters
+          YoutubePullerParameters(
+            integrationId = 1,
+            minDate = LocalDateTime.of(2023, 1, 1, 0, 0),
+            datalakeOutputDir = "./datalake"
+          )
         )
       )
-    )
 
-    _ <- ZIO.logInfo("YouTube pull result workflow started!")
-  } yield ()
-}
+      _ <- ZIO.logInfo("YouTube pull result workflow started!")
+    } yield ()
+  }
 ```
 
 A few important notes:
-1. `workflowClient.newWorkflowStub[YoutubePullWorkflow](workflowOptions)` returns an instance of `ZWorkflowStub.Of[YoutubePullWorkflow]`. *ZIO Temporal* provides you with a typed wrapper/stub to execute workflows.
+1. *workflowClient.newWorkflowStub[YoutubePullWorkflow]\(workflowOptions\)* returns an instance of *ZWorkflowStub.Of[YoutubePullWorkflow]*. *ZIO Temporal* provides you with a typed wrapper/stub to execute workflows.
     - Scheduling *Workflow Execution* requires network communication with the *Temporal Server*. Therefore, *Workflow Execution* arguments must be serialized and transferred over the network
-    - Therefore, it's required to wrap the workflow method invocation into the `ZWorkflowStub.start(...)` method. 
-    - `ZWorkflowStub.start` checks your code at compile-time. For instance, it ensures you invoke the correct method (the one with `@workflowMethod` annotation). The method invocation is then transformed into a remote call using low-level Java SDK primitives.
-2. `ZWorkflowStub.start` doesn't wait for the *Workflow* to be executed:
+    - Therefore, it's required to wrap the workflow method invocation into the *ZWorkflowStub.start* method. 
+    - *ZWorkflowStub.start* checks your code at compile-time. For instance, it ensures you invoke the correct method (the one with *@workflowMethod* annotation). The method invocation is then transformed into a remote call using low-level Java SDK primitives.
+2. *ZWorkflowStub.start* doesn't wait for the *Workflow* to be executed:
     - It returns immediately once the Temporal Server schedules this workflow execution
-    - If you want to wait for the *Workflow Execution* to finish, use `ZWorkflowStub.execute` method. It schedules the *Workflow Execution* and waits until it's picked up by a worker and executed. The method returns the workflow result in case of success (a `PullingResult` in our case) and the error details in case of failure.
+    - If you want to wait for the *Workflow Execution* to finish, use *ZWorkflowStub.execute* method. It schedules the *Workflow Execution* and waits until it's picked up by a worker and executed. The method returns the workflow result in case of success (a *PullingResult* in our case) and the error details in case of failure.
 
-Running the above code requires you to provide an instance of `ZWorkflowClient`.  
-The assumption is that you have a single instance of the `ZWorkflowClient` that is shared through the whole client application.  
+Running the above code requires you to provide an instance of *ZWorkflowClient*.  
+The assumption is that you have a single instance of the *ZWorkflowClient* that is shared through the whole client application.  
 
-*ZIO Temporal* leverages *ZIO's* standard dependency injection and configuration capabilities for constructing library components such as `ZWorkflowClient`. Here is how you create it:
+*ZIO Temporal* leverages *ZIO's* standard dependency injection and configuration capabilities for constructing library components such as *ZWorkflowClient*. Here is how you create it:
 
 ```scala mdoc:silent
 val clientProgram: Task[Unit] = 
@@ -724,7 +733,7 @@ val clientProgram: Task[Unit] =
 ### Running the worker
 The client program you defined allows scheduling YouTube pulling workflow execution. The next step is to set up a Worker process that will execute the workflow logic.  
 
-To make this implementation run *Workflow Executions*, you must create and register a *ZWorker*. You must specify the *task queue* for the *ZWorker* and provide *Workflow* and *Activity* implementations there. An instance of **ZWorkerFactory** is used to create *ZWorkers* and register *Workflow implementations*:
+To make this implementation run *Workflow Executions*, you must create and register a *ZWorker*. You must specify the *task queue* for the *ZWorker* and provide *Workflow* and *Activity* implementations there. An instance of *ZWorkerFactory* is used to create *ZWorkers* and register *Workflow implementations*:
 
 ```scala mdoc:silent
 import zio.temporal.worker._
@@ -775,11 +784,11 @@ That's it! Once you run the worker program, it will start picking up workflows y
 ## Temporal UI
 After you schedule workflow execution and start the worker process, go ahead to Temporal UI on `http://localhost:8233`.  
 
-Once you open it, you'll see a list of workflow executions created on the Temporal Server:  
+Once you open it, you should see a list of workflow executions created on the Temporal Server:  
 
 ![Workflows listing](/images/workflows-and-activities/workflows_list.png)
 
-You can navigate to workflow details by clicking on the workflow run. On this page, you'll see the information about the workflow, such as *Workflow ID*, *Task Queue*, *Workflow Type*, the input parameters, and the workflow result (or error if it failed).  
+You can navigate to workflow details by clicking on the workflow run. On this page, you should see the information about the workflow, such as *Workflow ID*, *Task Queue*, *Workflow Type*, the input parameters, and the workflow result (or error if it failed).  
 
 ![Workflow details](/images/workflows-and-activities/workflow_details.png)
 
@@ -790,15 +799,15 @@ Scroll down to see the *Workflow Execution History*. It contains a detailed log 
 ## Homework
 I suggest you experiment with the example to learn Temporal basics better 🙃
 Here is what you can try:
-- Define your own activity, providing additional functionality, and use it in the `YoutubePullerWorkflow`💡
+- Define your own activity, providing additional functionality, and use it in the *YoutubePullerWorkflow*💡
 - Introduce random errors in the activities code. Take a look at how Temporal performs retries and handles them 🔄
 - Kill the worker process in the middle of the Workflow Execution. Observe how the Workflow Execution is later resumed once you start a new worker 💪
 
-I hope you'll enjoy it!
+I hope you enjoy it!
 
 ## What's next
-In the next post in the series, you will get familiar with Workflow building parts, such as *Query methods*, *Signal methods*, etc.  
-They will allow you to implement a Workflow responsible for user interactions.  
+In the next post in the series, you'll get familiar with other Workflow building parts, such as *Query methods*, *Signal methods*, etc.  
+They'll allow you to implement a Workflow responsible for user interactions.  
 See you in the next part! 
 
 ## Reference
