@@ -4,7 +4,7 @@ date: 2023-10-02T21:30:00+02:00
 description: "Explore the essential components of Temporal: Workflows and Activities. Try to unlock the potential of orchestration using Temporal!"
 series: "Temporal Workflows with ZIO"
 draft: false
-tags: ["Temporal", "ZIO"]
+tags: ["Temporal", "ZIO", "Workflows", "Activities"]
 ---
 
 ## Introduction

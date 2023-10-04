@@ -4,7 +4,7 @@ date: 2023-10-02T21:30:00+02:00
 description: "Explore the essential components of Temporal: Workflows and Activities. Try to unlock the potential of orchestration using Temporal!"
 series: "Temporal Workflows with ZIO"
 draft: false
-tags: ["Temporal", "ZIO"]
+tags: ["Temporal", "ZIO", "Workflows", "Activities"]
 ---
 
 ## Introduction
@@ -686,14 +686,14 @@ val workflowOptions = ZWorkflowOptions
 //       backoffCoefficient = Some(value = 1.2),
 //       maximumInterval = None,
 //       doNotRetry = ArraySeq("java.lang.IllegalArgumentException"),
-//       javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@7fef485d
+//       javaOptionsCustomization = zio.temporal.ZRetryOptions$$$Lambda$2072/0x0000000800ac3840@6fe47be
 //     )
 //   ),
 //   memo = Map(),
 //   searchAttributes = None,
 //   contextPropagators = List(),
 //   disableEagerExecution = None,
-//   javaOptionsCustomization = zio.temporal.workflow.ZWorkflowOptions$SetTaskQueue$$$Lambda$2074/0x0000000800ac7040@27131d01
+//   javaOptionsCustomization = zio.temporal.workflow.ZWorkflowOptions$SetTaskQueue$$$Lambda$2074/0x0000000800ac7040@7fef485d
 // )
 ``` 
 

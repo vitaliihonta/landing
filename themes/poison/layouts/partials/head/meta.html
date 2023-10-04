@@ -60,6 +60,8 @@
 <meta name="twitter:description" content="{{ .Scratch.Get "description" }}" />
 {{ if .Params.tags }}
 <meta name="keywords" content="{{ with .Params.tags }}{{ delimit . ", "}}{{ end }}" />
+{{ else }}
+<meta name="keywords" content="{{ with .Site.Params.tags }}{{ delimit . ", "}}{{ end }}" />
 {{ end }}
 
 <!-- Link Tags -->

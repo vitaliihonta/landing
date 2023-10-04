@@ -4,7 +4,7 @@ description: "Meet Temporal - a distributed workflow management system for build
 date: 2023-09-05T10:00:00+02:00
 series: "Temporal Workflows with ZIO"
 draft: false
-tags: ["Temporal", "ZIO"]
+tags: ["Temporal", "ZIO", "Introduction"]
 ---
 
 ## Introduction
