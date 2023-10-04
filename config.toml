@@ -16,6 +16,7 @@ disqus_url = 'https://poison.lukeorth.com'
 [params]
     brand = "Vitalii Honta"
     brand_image = "/images/avatar_square.png"
+    tags = ["Vitalii Honta"]
 
     dark_mode = true
 
