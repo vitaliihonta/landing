@@ -3,6 +3,7 @@ title: "Welcome to my personal blog!"
 description: "Hello there, my name is Vitalii, and this is my first blog post 👋"
 date: 2023-06-29T15:04:46+02:00
 draft: false
+tags: ["Vitalii Honta Welcome"]
 ---
 
 Hello there, my name is Vitalii, and this is my first blog post 👋  
