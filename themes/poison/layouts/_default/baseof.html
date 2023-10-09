@@ -1,10 +1,10 @@
 {{ partial "head/head.html" . }}
     <body class="{{if .Site.Params.layoutReverse}}layout-reverse {{end}}{{if .Site.Params.dark_mode}}dark-theme{{end}}">
+        <div class="announcementBar_mb4j" style="background-color:#2b2b2b;color:#fff" role="banner">
+          <div class="content_knG7 announcementBarContent_xLdY">Support Ukraine 🇺🇦 <a target="_blank"
+            rel="noopener noreferrer" href="http://u24.gov.ua/"> Help Provide Aid to Ukraine</a>.</div>
+        </div>
         <div class="wrapper">
-            <div class="announcementBar_mb4j" style="background-color:#2b2b2b;color:#fff" role="banner">
-                <div class="content_knG7 announcementBarContent_xLdY">Support Ukraine 🇺🇦 <a target="_blank"
-                        rel="noopener noreferrer" href="http://u24.gov.ua/"> Help Provide Aid to Ukraine</a>.</div>
-            </div>
             {{ partial "sidebar/sidebar.html" . }}
             <main class="content container">
                 {{ block "main" . -}}{{- end }}

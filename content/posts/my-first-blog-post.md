@@ -3,6 +3,7 @@ title: "Welcome to my personal blog!"
 description: "Hello there, my name is Vitalii, and this is my first blog post 👋"
 date: 2023-06-29T15:04:46+02:00
 draft: false
+tags: ["Vitalii Honta Welcome"]
 ---
 
 Hello there, my name is Vitalii, and this is my first blog post 👋  
@@ -10,7 +11,6 @@ I’m passionate about software engineering (especially Scala, but also like Pyt
 
 The things I feel the most interested in are Functional Programming,  
 Data Engineering, Distributed Systems in general, Workflow Management Systems, etc.  
-<!--more-->
 
 I believe software engineering (and functional programming in particular) should be:
 - **Principled** but **practical**
