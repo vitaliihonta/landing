@@ -1,2 +1,2 @@
-# landing-vhonta-dev
-My personal landing
+# Landing vhonta.dev
+My personal website
