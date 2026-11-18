@@ -1,0 +1,10 @@
+{{ define "main" }}
+<section class="archive">
+  <h1>{{ if eq .RelPermalink (("posts/" | relURL)) }}Writing{{ else }}{{ .Title }}{{ end }}</h1>
+  <ul class="entries">
+    {{ range .Pages }}
+      {{ partial "post-row.html" . }}
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

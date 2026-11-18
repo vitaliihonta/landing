@@ -1,0 +1,90 @@
+{{ define "main" }}
+<section class="intro" aria-labelledby="intro-title">
+  <div>
+    <h1 id="intro-title">Vitalii Honta</h1>
+    <p class="role">Staff Software Engineer <span>· Prague, Czechia</span></p>
+    <p class="bio">I build distributed systems, backend platforms, and data infrastructure. My work spans enterprise data integrations and workflow orchestration.</p>
+    <ul class="contact" aria-label="Contact and profiles">
+      <li><a class="primary" href="mailto:{{ site.Params.email }}">Email me</a></li>
+      <li><a href="{{ site.Params.github }}">GitHub</a></li>
+      <li><a href="{{ site.Params.linkedin }}">LinkedIn</a></li>
+      <li><a href="{{ "cv/" | relURL }}">CV</a></li>
+    </ul>
+  </div>
+  {{ with resources.Get "images/vitalii-honta.jpg" }}
+    <img class="portrait" src="{{ .RelPermalink }}" alt="Vitalii Honta" width="{{ .Width }}" height="{{ .Height }}">
+  {{ end }}
+</section>
+
+<section id="experience" class="home-section" aria-labelledby="experience-title">
+  <h2 id="experience-title">Experience</h2>
+  <ol class="timeline">
+    <li>
+      <p class="timeline-date">2022–present</p>
+      <div>
+        <h3><img src="{{ "images/companies/backstory.png" | relURL }}" alt="" width="24" height="24"> Backstory / People.ai</h3>
+        <p>Senior, then Staff Software Engineer · Enterprise CRM integrations and a shared data deletion platform.</p>
+      </div>
+    </li>
+    <li>
+      <p class="timeline-date">2020–2022</p>
+      <div>
+        <h3><img src="{{ "images/companies/evo.png" | relURL }}" alt="" width="24" height="24"> EVO</h3>
+        <p>Technical Lead · Led development of payment infrastructure now known as RozetkaPay, serving Rozetka and Prom.ua.</p>
+      </div>
+    </li>
+    <li>
+      <p class="timeline-date">2018–2020</p>
+      <div>
+        <h3><img src="{{ "images/companies/andersen.png" | relURL }}" alt="" width="24" height="24"> Andersen Lab</h3>
+        <p>Scala Engineer · Real-time transaction services for a small-business banking platform.</p>
+      </div>
+    </li>
+    <li>
+      <p class="timeline-date">2016–2018</p>
+      <div>
+        <h3><img src="{{ "images/companies/dataroot.png" | relURL }}" alt="" width="24" height="24"> DataRoot Labs</h3>
+        <p>Scala Developer · Vehicle tracking and geofencing for Mabat, plus aviation telemetry.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section id="projects" class="home-section" aria-labelledby="projects-title">
+  <h2 id="projects-title">Open source</h2>
+  <div class="projects">
+    <article>
+      <h3><a href="https://zio-temporal.vhonta.dev/">ZIO Temporal</a></h3>
+      <p>A Scala library for defining and running Temporal workflows with ZIO.</p>
+    </article>
+    <article>
+      <h3><a href="https://scala-ql.vhonta.dev/">Scala QL</a></h3>
+      <p>Query Scala collections and files such as CSV, JSON, and Excel with a Scala DSL.</p>
+    </article>
+  </div>
+</section>
+
+<section id="writing" class="home-section" aria-labelledby="writing-title">
+  <div class="section-heading">
+    <h2 id="writing-title">Selected writing</h2>
+    <a href="{{ "posts/" | relURL }}">All writing</a>
+  </div>
+  <ul class="entries">
+    {{ range slice "posts/zio-temporal-intro" "posts/workflows-activities" }}
+      {{ with site.GetPage . }}
+        {{ partial "post-row.html" . }}
+      {{ end }}
+    {{ end }}
+  </ul>
+</section>
+
+<section id="talks" class="home-section" aria-labelledby="talks-title">
+  <h2 id="talks-title">Selected talks</h2>
+  <ul class="entries talks">
+    <li><a href="https://www.youtube.com/watch?v=3vC_2lL8eLI">Solid &amp; Flexible: The Tour of Temporal Workflows</a><span>Functional Scala · 2023</span></li>
+    <li><a href="https://www.youtube.com/watch?v=8MUnEahr5tk">Build Invincible Apps With ZIO And Temporal</a><span>Functional Scala · 2022</span></li>
+    <li><a href="https://www.youtube.com/watch?v=CLL-4R_kx7Q">Stress-free DWH with Delta Lake</a><span>Scala Ukraine · 2022 · Ukrainian</span></li>
+    <li><a href="https://www.youtube.com/watch?v=S2a57ddG5wQ">Scala 3 in Action</a><span>ScalaUA · 2020</span></li>
+  </ul>
+</section>
+{{ end }}

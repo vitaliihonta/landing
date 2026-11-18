@@ -108,7 +108,47 @@ Therefore, it is important for the Workflow logic to act deterministically so th
 ## Content Sync Architecture
 Now we can go back to the business task.  
 Let's get ahead a little to the Content sync platform architecture using Temporal!
-![Content sync architecture](/images/content_sync_architecture.jpg)
+{{< mermaid >}}
+flowchart TD
+    accTitle: Content Sync Architecture
+    accDescr: Telegram configures sources and delivers recommendations. Temporal workflows pull YouTube videos and news into Parquet, launch a Spark job, and deliver the results stored in PostgreSQL.
+
+    Bot[Telegram bot]
+    YouTube[YouTube API]
+    News[News API]
+    Callback[ZIO HTTP callback server]
+    YouTubeSetup[YouTube setup workflow]
+    NewsSetup[News API setup workflow]
+    Config[(PostgreSQL: feed configuration)]
+    Pull[Scheduled pulling workflow]
+    Parquet[(Parquet files)]
+    Launch[Scheduled recommendations workflow]
+    Spark[Apache Spark job]
+    Feed[(PostgreSQL: content feed)]
+    OnDemand[On-demand recommendations workflow]
+    Periodic[Periodic recommendations workflow]
+
+    Bot <-->|Set up YouTube| YouTubeSetup
+    Bot <-->|Set up News API| NewsSetup
+    YouTubeSetup -->|Google OAuth2| YouTube
+    YouTube -->|OAuth2 callback| Callback
+    Callback -->|Forward callback| YouTubeSetup
+    YouTubeSetup -->|Save configuration| Config
+    NewsSetup -->|Save topics| Config
+
+    Config -->|Source settings| Pull
+    YouTube -->|New videos from subscriptions| Pull
+    News -->|Articles| Pull
+    Pull -->|Write content| Parquet
+    Parquet -->|Job reads content| Spark
+    Launch -->|Orchestrate and retry job| Spark
+    Spark -->|Store recommendations| Feed
+
+    Bot -->|Request latest feed| OnDemand
+    Feed -->|Latest recommendations| OnDemand
+    Feed -->|Stored recommendations| Periodic
+    Periodic -.->|Push periodic feed| Bot
+{{< /mermaid >}}
 
 Important notes here:
 1. The content sources are **YouTube API** (for videos) and **News API** (for articles)

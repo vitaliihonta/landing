@@ -1,0 +1,5 @@
+---
+aliases:
+  - /about/
+  - /about/about/
+---
