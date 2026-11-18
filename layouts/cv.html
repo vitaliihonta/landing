@@ -1,0 +1,8 @@
+{{ define "main" }}
+<section class="archive cv" aria-labelledby="cv-title">
+  <h1 id="cv-title">{{ .Title }}</h1>
+  {{ $pdf := "files/vitalii-honta-cv.pdf" | relURL }}
+  <p><a href="{{ $pdf }}">Open PDF</a> · <a href="{{ $pdf }}" download>Download PDF</a></p>
+  <iframe class="cv-preview" src="{{ $pdf }}" title="Vitalii Honta’s CV (PDF)"></iframe>
+</section>
+{{ end }}

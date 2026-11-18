@@ -80,6 +80,8 @@ h3 { font-size: 1.14rem; }
 
 .archive, .article { margin: 0 auto; padding-top: clamp(2rem, 6vw, 4rem); max-width: 47rem; min-width: 0; }
 .archive h1, .article h1 { font-size: clamp(2.6rem, 6vw, 4rem); margin-bottom: .75rem; }
+.cv { max-width: 55rem; }
+.cv-preview { display: block; width: 100%; height: 75vh; min-height: 24rem; margin-top: 1.2rem; border: 1px solid var(--line); border-radius: .45rem; }
 .article h1 { margin-top: .6rem; }
 .tags { display: flex; flex-wrap: wrap; gap: .35rem 1rem; padding: 0; list-style: none; margin-top: .5rem; }
 .series { padding: 1rem 1.2rem; margin-top: 1.4rem; background: var(--panel); border-radius: .4rem; }
