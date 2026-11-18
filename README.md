@@ -12,4 +12,4 @@ Confirm the current provider and production branch before pushing deploy changes
 
 `static/_redirects` supplies HTTP 301 redirects on platforms that support that format. On other hosts, configure equivalent rules for `/about/` and `/about/about/`. Hugo also emits HTML fallback redirects for both paths.
 
-Before promotion, check the homepage, article URLs, `/posts/index.xml`, `/sitemap.xml`, and the 404 response on the preview host. See [the rebuild specification](PERSONAL-LANDING-SPEC.md) for the full migration and rollback checklist.
+Before promotion, check the homepage, article URLs, `/posts/index.xml`, `/sitemap.xml`, and the 404 response on the preview host.
