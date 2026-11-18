@@ -8,7 +8,12 @@ help:
 
 .PHONY: hugo-dev
 hugo-dev:
-	hugo server -b http://localhost:1313/
+	hugo server --renderToMemory --noBuildLock
+
+.PHONY: hugo-build
+# target: hugo-build - Build the production site into dist/
+hugo-build:
+	hugo --destination dist --cleanDestinationDir --noBuildLock --panicOnWarning
 
 .PHONY: mdoc
 mdoc:

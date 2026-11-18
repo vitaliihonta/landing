@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="{{ site.Language.Locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ $title := site.Title }}
+  {{ if .IsHome }}{{ $title = printf "%s — Staff Software Engineer" site.Title }}{{ else }}{{ $title = printf "%s — %s" .Title site.Title }}{{ end }}
+  {{ $description := .Description | default site.Params.description }}
+  {{ $canonical := .Permalink }}
+  {{ if eq .Kind "404" }}<meta name="robots" content="noindex">{{ else }}<link rel="canonical" href="{{ $canonical }}">{{ end }}
+  <title>{{ $title }}</title>
+  <meta name="description" content="{{ $description }}">
+  <meta property="og:title" content="{{ $title }}">
+  <meta property="og:description" content="{{ $description }}">
+  <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+  <meta property="og:url" content="{{ $canonical }}">
+  <meta property="og:image" content="{{ site.Params.shareImage | absURL }}">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="{{ "favicon.png" | relURL }}" type="image/png">
+  <link rel="alternate" type="application/rss+xml" title="Vitalii Honta — Writing" href="{{ "posts/index.xml" | relURL }}">
+  {{ with resources.Get "css/site.css" | minify | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}">{{ end }}
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header shell">
+    <a class="wordmark" href="{{ site.Home.RelPermalink }}">Vitalii Honta</a>
+    <nav aria-label="Main navigation">
+      <a href="{{ site.Home.RelPermalink }}#projects">Projects</a>
+      <a href="{{ "posts/" | relURL }}">Writing</a>
+      <a href="{{ site.Home.RelPermalink }}#talks">Talks</a>
+    </nav>
+  </header>
+  <main id="main" class="shell">
+    {{ block "main" . }}{{ end }}
+  </main>
+  <footer class="site-footer shell">
+    <a href="{{ "posts/index.xml" | relURL }}">RSS</a>
+    <a href="https://u24.gov.ua/">Support Ukraine</a>
+  </footer>
+</body>
+</html>

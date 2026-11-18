@@ -1,0 +1,5 @@
+{{ if not (.Page.Store.Get "mermaid") }}
+  {{ .Page.Store.Set "mermaid" true }}
+  {{ with resources.Get "js/mermaid.js" | fingerprint }}<script defer src="{{ .RelPermalink }}"></script>{{ end }}
+{{ end }}
+<pre class="mermaid">{{ .Inner | strings.TrimSpace }}</pre>

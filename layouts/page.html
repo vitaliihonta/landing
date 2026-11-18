@@ -1,0 +1,25 @@
+{{ define "main" }}
+<article class="article">
+  <header>
+    <a href="{{ "posts/" | relURL }}">All writing</a>
+    <h1>{{ .Title }}</h1>
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+    {{ with .GetTerms "tags" }}
+      <ul class="tags" aria-label="Topics">
+        {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+      </ul>
+    {{ end }}
+  </header>
+  {{ range .GetTerms "series" }}
+    <nav class="series" aria-label="Article series">
+      <strong>{{ .Title }}</strong>
+      <ol>
+        {{ range .Pages.ByDate }}
+          <li>{{ if eq . $ }}<span aria-current="page">{{ .LinkTitle }}</span>{{ else }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}</li>
+        {{ end }}
+      </ol>
+    </nav>
+  {{ end }}
+  <div class="prose">{{ .Content }}</div>
+</article>
+{{ end }}
