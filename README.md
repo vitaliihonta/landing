@@ -8,7 +8,7 @@ Install the Hugo version in `.hugo-version`, then run `make hugo-dev` and open `
 
 ## Hosting
 
-Confirm the current provider and production branch before pushing deploy changes. Configure a source build from the repo root using the pinned Hugo version, `make hugo-build` (or its Hugo command), and publish `dist/`. The old tracked `public/` directory is historical and should be retired after confirming the host uses the new output directory.
+Cloudflare Pages builds from the repo root using the pinned Hugo version, runs `make hugo-build`, and publishes `dist/`. The production branch is `main`.
 
 `static/_redirects` supplies HTTP 301 redirects on platforms that support that format. On other hosts, configure equivalent rules for `/about/` and `/about/about/`. Hugo also emits HTML fallback redirects for both paths.
 

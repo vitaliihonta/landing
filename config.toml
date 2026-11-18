@@ -16,11 +16,3 @@ tag = 'tags'
 
 [markup.highlight]
 style = 'github'
-
-[[module.mounts]]
-source = 'assets'
-target = 'assets'
-
-[[module.mounts]]
-source = 'themes/poison/assets/js/lib/mermaid.js'
-target = 'assets/js/mermaid.js'
